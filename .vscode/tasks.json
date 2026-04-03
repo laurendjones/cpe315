@@ -1,0 +1,26 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Run with MARS (java -jar)",
+      "type": "shell",
+      "command": "java -jar \"${workspaceFolder}/tools/mars.jar\" \"${file}\"",
+      "presentation": { "echo": true, "reveal": "always" },
+      "problemMatcher": []
+    },
+    {
+      "label": "Run with QtSpim (qtspim)",
+      "type": "shell",
+      "command": "qtspim \"${file}\"",
+      "presentation": { "echo": true, "reveal": "always" },
+      "problemMatcher": []
+    },
+    {
+      "label": "Assemble with spim (spim -file)",
+      "type": "shell",
+      "command": "spim -file \"${file}\"",
+      "presentation": { "echo": true, "reveal": "always" },
+      "problemMatcher": []
+    }
+  ]
+}
