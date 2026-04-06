@@ -1,18 +1,19 @@
-#  1.  Write the following fast "mod" function.  This function uses no modulus operator, multiplication,
-# or division - it uses only basic arithmetic/logical operations (add, sub, and...).  
-# The function takes two integers as inputs - a number (num), and a divisor (div).  
-# You are guaranteed that div is a power of 2.  You want the remainder of num / div.  
-# For example, if num=22 (00010110 in binary) and div = 4 (100) would return 2 (10). 
-# Your algorithm should *not* repeatedly subtract (or add) div from num. Name your file mod.asm.  
-# Program 1 only needs to work with positive numbers.
-
 #  Lab 1, Program 1
 #  Lauren Jones, Sean Tracy
 #  CPE 315
 
 
-# JAVA FUNCTION EQUIVALENT:
+##  PROBLEM 1.
+#   Write the following fast "mod" function.  This function uses no modulus operator, multiplication,
+#   or division - it uses only basic arithmetic/logical operations (add, sub, and...).  
+#   The function takes two integers as inputs - a number (num), and a divisor (div).  
+#   You are guaranteed that div is a power of 2.  You want the remainder of num / div.  
+#   For example, if num=22 (00010110 in binary) and div = 4 (100) would return 2 (10). 
+#   Your algorithm should *not* repeatedly subtract (or add) div from num. Name your file mod.asm.  
+#   Program 1 only needs to work with positive numbers.
 
+
+## JAVA FUNCTION EQUIVALENT:
 # import java.util.Scanner; 
 #
 # public class javamod {
@@ -36,10 +37,12 @@
 #     }
 # }
 
+
+## ASSEMBLY CODE:
 # declare global so programmer can see actual addresses.
 .globl welcome
 .globl prompt
-.globl sumText
+.globl modulusText
 
 #  Data Area (this area contains strings to be displayed during the program)
 .data
