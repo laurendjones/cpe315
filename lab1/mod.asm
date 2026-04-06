@@ -11,6 +11,31 @@
 #  CPE 315
 
 
+# JAVA FUNCTION EQUIVALENT:
+
+# import java.util.Scanner; 
+#
+# public class javamod {
+#     public static void main(String[] args) {
+#         // Create a Scanner object
+#         Scanner scanner = new Scanner(System.in); 
+#         System.out.println("This program takes the modulus of two numbers");
+
+#         System.out.print("Enter an integer: ");
+#         int num = scanner.nextInt(); // Read first integer
+
+#         System.out.print("Enter an integer: ");
+#         int div = scanner.nextInt(); // Read second integer
+        
+#         // Compute modulus using bitwise AND  
+#         int modulus = num & (div - 1);
+
+#         System.out.println("Modulus:  " + modulus);
+
+#         scanner.close(); 
+#     }
+# }
+
 # declare global so programmer can see actual addresses.
 .globl welcome
 .globl prompt
@@ -25,7 +50,7 @@ welcome:
 prompt:
 	.asciiz " Enter an integer: "
 
-sumText: 
+modulusText: 
 	.asciiz " \n Modulus = "
 
 #Text Area (i.e. instructions)
@@ -41,4 +66,53 @@ main:
 	syscall
 
 	# Display prompt
+	ori     $v0, $0, 4		
+
+    # This is the starting address of the prompt 
+	la $a0, prompt
+	syscall
+
+	# Read 1st integer (num) from the user (5 is loaded into $v0, then a syscall)
+	ori     $v0, $0, 5
+	syscall
+
+	# Add 1st integer to register t0
+	addu    $t0, $v0, $0
+
+	# Display prompt (4 is loaded into $v0 to display)
+	# 0x10010022 is hexidecimal for 34 decimal (the length of the previous welcome message)
 	ori     $v0, $0, 4			
+	la $a0, prompt
+	syscall
+
+	# Read 2nd integer 
+	ori	$v0, $0, 5			
+	syscall
+	# $v0 now has the value of the second integer
+
+	# Add 2nd integer to register t1
+	addu    $t1, $v0, $0
+
+    # Assume $t0 = num, $t1 = div
+    # Compute mask = div - 1
+    addi $t2, $t1, -1
+
+    # Compute modulus: result = num & mask
+    and $t3, $t0, $t2
+
+    # $t3 now contains the result (num % div)
+
+    # Display the modulus text
+	ori     $v0, $0, 4			
+    la      $a0, modulusText
+	syscall
+	
+	# Display the modulus (in register t3)
+	# load 1 into $v0 to display an integer
+	ori     $v0, $0, 1
+	add 	$a0, $t3, $0
+	syscall
+
+	# Exit (load 10 into $v0)
+	ori     $v0, $0, 10
+	syscall
