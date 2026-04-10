@@ -48,13 +48,13 @@
 .data
 
 welcome:
-	.asciiz " This program takes the modulus of two numbers \n\n"
+	.asciiz "This program takes the modulus of two numbers\n\n"
 
 prompt:
-	.asciiz " Enter an integer: "
+	.asciiz "Enter an integer: "
 
 modulusText: 
-	.asciiz " \n Modulus = "
+	.asciiz "\nModulus = "
 
 #Text Area (i.e. instructions)
 .text
@@ -72,7 +72,8 @@ main:
 	ori     $v0, $0, 4		
 
     # This is the starting address of the prompt 
-	la $a0, prompt
+	lui $a0, 0x1001
+	ori $a0, $a0, 0x30   # $a0 = 0x10010030
 	syscall
 
 	# Read 1st integer (num) from the user (5 is loaded into $v0, then a syscall)
@@ -85,7 +86,8 @@ main:
 	# Display prompt (4 is loaded into $v0 to display)
 	# 0x10010022 is hexidecimal for 34 decimal (the length of the previous welcome message)
 	ori     $v0, $0, 4			
-	la $a0, prompt
+	lui $a0, 0x1001
+	ori $a0, $a0, 0x30   # $a0 = 0x10010030
 	syscall
 
 	# Read 2nd integer 
@@ -107,7 +109,8 @@ main:
 
     # Display the modulus text
 	ori     $v0, $0, 4			
-    la      $a0, modulusText
+    lui $a0, 0x1001
+	ori $a0, $a0, 0x43   # $a0 = 0x10010043  
 	syscall
 	
 	# Display the modulus (in register t3)
