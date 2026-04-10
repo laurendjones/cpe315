@@ -1,10 +1,14 @@
 #Java code
 # exponentiate(int base, int exp) {
 #     int result = 1;
-#     for (int i = 0; i < exp; i++) {
-#         result *= base;
-#     }
-#     return result;
+        # for (int i = 0; i < exp; i++) {
+        #     int temp = 0;
+        #     for (int j = base; j > 0; j--) {
+        #         temp += result;
+        #     }
+        #     result = temp;
+        # }
+        # print(result);
 # }
 
 
