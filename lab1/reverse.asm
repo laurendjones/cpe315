@@ -12,7 +12,29 @@
 
 
 ## JAVA FUNCTION EQUIVALENT:
+# import java.util.Scanner; 
+# public class javaReverse {
+# public static void main(String[] args) {
+# // Create a Scanner object
+# Scanner scanner = new Scanner(System.in); 
+#     System.out.println("This program takes the reverse-ordered binary of the input number");
+    
+#     System.out.print("Enter an integer: ");
+#     int num = scanner.nextInt(); // Read first integer
 
+#     // Reverses the bits of num
+#     int reversed = 0;
+#         for (int i = 0; i < 32; i++) {
+#             reversed <<= 1;           // Shift result left by 1
+#             reversed |= (num & 1);    // Add least significant bit of num
+#             num >>>= 1;               // Shift num right by 1 (unsigned)
+#         }
+
+#     System.out.println("Reverse:  " + reversed);
+
+#     scanner.close(); 
+#     }
+# }
 
 ## ASSEMBLY CODE:
 # declare global so programmer can see actual addresses.
@@ -48,7 +70,8 @@ main:
 	ori     $v0, $0, 4		
 
     # This is the starting address of the prompt 
-	la $a0, prompt
+	lui $a0, 0x1001
+	ori $a0, $a0, 0x47   # $a0 = 0x10010047
 	syscall
 
     # Read 1st integer (num) from the user (5 is loaded into $v0, then a syscall)
@@ -85,7 +108,8 @@ main:
 
     # Display the reversed text
 	ori     $v0, $0, 4			
-    la      $a0, reverseText
+    lui $a0, 0x1001
+	ori $a0, $a0, 0x5D   # $a0 = 0x10010046
 	syscall
 	
 	# Display the reversed number (in $t1)
