@@ -72,6 +72,11 @@ Code which does not compile will receive a score of 0.
 
 You must have a Makefile which should compile the lab assignment using a 'make lab2' command.  Here is a sample Makefile
 
+lab2:
+	#replace the following command with your compilation command
+	/opt/jdk-16/bin/javac *.java
+
+
 Your code should run with the command: /opt/jdk-16/bin/java lab2 file.asm (where file.asm is the input file)
 
 Turning in the assignment
