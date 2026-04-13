@@ -13,16 +13,19 @@ public class TwoPassAssembler {
 
     public static List<String> readFile (String filename) {
         List<String> fileLines = new ArrayList<>(); 
+        System.out.println("File contents:");
         try {
             Scanner scanner = new Scanner(new File(filename));
             while (scanner.hasNextLine()) {
-                fileLines.add(scanner.nextLine()); // Store each line of the file in a list for processing in the second pass
+                String line = scanner.nextLine();
+                fileLines.add(line); // Store each line of the file in a list for processing in the second pass
+                System.out.println(line);
             }
             scanner.close();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-        System.out.println(fileLines);
+        
         return fileLines;
     }
 
@@ -50,7 +53,7 @@ public class TwoPassAssembler {
                 }
             }
         }
-        System.out.println("Keywords found: " + foundKeywords);
+        System.out.println("\n\nKeywords found: " + foundKeywords);
         System.out.println("Registers found: " + foundRegisters);
     }
 
