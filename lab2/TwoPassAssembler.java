@@ -41,6 +41,7 @@ public class TwoPassAssembler {
         Set<String> foundRegisters = new HashSet<>();
 
         for (String line : fileLines) {
+            // Ignoring spaces, commas, parentheses for keyword/register extraction
             String[] tokens = line.split("[\\s,()]+");
 
             for (String word : tokens) {
