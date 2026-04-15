@@ -40,15 +40,20 @@ public class TwoPassAssembler {
         Set<String> foundKeywords = new HashSet<>();
         Set<String> foundRegisters = new HashSet<>();
 
+        System.out.println("\n -------- \n Cleaned Code (Comments Stripped): ");
+
         for (String line : fileLines) {
-<<<<<<< HEAD
-            // Ignoring spaces, commas, parentheses for keyword/register extraction
-=======
+            // Strip comments
             int conmmentIndex = line.indexOf('#');
             if (conmmentIndex != -1) {
                 line = line.substring(0, conmmentIndex); // Remove comments from the line
             }
->>>>>>> 21e91f3a7955c880d0cbad1ae773911d62093a30
+
+            // Clean up whitespace 
+            line = line.trim();
+            if (line.isEmpty()) continue; // Skip empty lines after trimming
+            System.out.println(line); // Print the cleaned line
+
             String[] tokens = line.split("[\\s,()]+");
 
             for (String word : tokens) {
@@ -58,9 +63,6 @@ public class TwoPassAssembler {
                     foundKeywords.add(word);
                 } else if (registers.contains(word)) {
                     foundRegisters.add(word);
-                
-                
-    
                 }
             }
         }
