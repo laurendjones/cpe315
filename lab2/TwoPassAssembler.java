@@ -18,8 +18,8 @@ public class TwoPassAssembler {
             Scanner scanner = new Scanner(new File(filename));
             while (scanner.hasNextLine()) {
                 String line = scanner.nextLine();
-                fileLines.add(line); // Store each line of the file in a list for processing in the second pass
-                System.out.println(line);
+                fileLines.add(line.trim()); // Store each line of the file in a list for processing in the second pass
+                System.out.println(line.trim());
             }
             scanner.close();
         } catch (FileNotFoundException e) {
