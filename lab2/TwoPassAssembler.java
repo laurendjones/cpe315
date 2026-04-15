@@ -18,8 +18,8 @@ public class TwoPassAssembler {
             Scanner scanner = new Scanner(new File(filename));
             while (scanner.hasNextLine()) {
                 String line = scanner.nextLine();
-                fileLines.add(line.trim()); // Store each line of the file in a list for processing in the second pass
-                System.out.println(line.trim());
+                fileLines.add(line); // Store each line of the file in a list for processing in the second pass
+                System.out.println(line);
             }
             scanner.close();
         } catch (FileNotFoundException e) {
@@ -39,14 +39,15 @@ public class TwoPassAssembler {
         
         Set<String> foundKeywords = new HashSet<>();
         Set<String> foundRegisters = new HashSet<>();
+        Set<String> foundLabels = new HashSet<>();
 
         System.out.println("\n -------- \n Cleaned Code (Comments Stripped): ");
 
         for (String line : fileLines) {
             // Strip comments
-            int conmmentIndex = line.indexOf('#');
-            if (conmmentIndex != -1) {
-                line = line.substring(0, conmmentIndex); // Remove comments from the line
+            int commentIndex = line.indexOf('#');
+            if (commentIndex != -1) {
+                line = line.substring(0, commentIndex); // Remove comments from the line
             }
 
             // Clean up whitespace 
