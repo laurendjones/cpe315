@@ -57,6 +57,7 @@ public class TwoPassAssembler {
 
             String[] tokens = line.split("[\\s,()]+");
 
+            // Looking for keywords, registers, and labels in the cleaned line
             for (String word : tokens) {
                 if (word.isEmpty()) continue; // Skip empty strings from extra spaces
 
@@ -64,11 +65,14 @@ public class TwoPassAssembler {
                     foundKeywords.add(word);
                 } else if (registers.contains(word)) {
                     foundRegisters.add(word);
+                } else if (word.endsWith(":")) { // words ending with ':'
+                    foundLabels.add(word);
                 }
             }
         }
         System.out.println("\n\nKeywords found: " + foundKeywords);
         System.out.println("Registers found: " + foundRegisters);
+        System.out.println("Labels found: " + foundLabels);
     }
 
     public static void main(String[] args) {
