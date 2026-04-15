@@ -41,7 +41,14 @@ public class TwoPassAssembler {
         Set<String> foundRegisters = new HashSet<>();
 
         for (String line : fileLines) {
+<<<<<<< HEAD
             // Ignoring spaces, commas, parentheses for keyword/register extraction
+=======
+            int conmmentIndex = line.indexOf('#');
+            if (conmmentIndex != -1) {
+                line = line.substring(0, conmmentIndex); // Remove comments from the line
+            }
+>>>>>>> 21e91f3a7955c880d0cbad1ae773911d62093a30
             String[] tokens = line.split("[\\s,()]+");
 
             for (String word : tokens) {
@@ -51,6 +58,9 @@ public class TwoPassAssembler {
                     foundKeywords.add(word);
                 } else if (registers.contains(word)) {
                     foundRegisters.add(word);
+                
+                
+    
                 }
             }
         }
