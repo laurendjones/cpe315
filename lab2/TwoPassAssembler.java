@@ -59,6 +59,18 @@ public class TwoPassAssembler {
             // Clean up whitespace 
             line = line.trim();
             if (line.isEmpty()) continue; // Skip empty lines after trimming
+
+            for (String instruction : keywords) {
+                if (line.startsWith(instruction)) {
+                    if (line.length() > instruction.length()) {
+                        char nextChar = line.charAt(instruction.length());
+                        // If next char is not whitespace, insert a space
+                        if (!Character.isWhitespace(nextChar)) {
+                            line = instruction + " " + line.substring(instruction.length());
+                        }
+                    }
+                }
+            }
             System.out.println(line); // Print the cleaned line
 
             // Split line into tokens
@@ -78,24 +90,6 @@ public class TwoPassAssembler {
                     currentInstruction = word;
                 } else if (registers.contains(word)) {
                     lineRegisters.add(word);
-                } else {
-                    // Check if the word is a concatenated instruction and register (e.g., "slt$t0")
-                    boolean together = false;
-                    for (String instruction : keywords) {
-                        if (word.startsWith(instruction)) {
-                            String remaining = word.substring(instruction.length());
-                            if (remaining.startsWith("$") && registers.contains(remaining)) {
-                                currentInstruction = instruction;
-                                lineRegisters.add(remaining);
-                                together = true;
-                                break;
-                            }
-                        }
-                    }
-                    if (!together) {
-                        continue; // If it's not a label, keyword, register, or valid concatenation, skip it
-                    }
-                
                 }
             }
 
