@@ -78,6 +78,24 @@ public class TwoPassAssembler {
                     currentInstruction = word;
                 } else if (registers.contains(word)) {
                     lineRegisters.add(word);
+                } else {
+                    // Check if the word is a concatenated instruction and register (e.g., "slt$t0")
+                    boolean together = false;
+                    for (String instruction : keywords) {
+                        if (word.startsWith(instruction)) {
+                            String remaining = word.substring(instruction.length());
+                            if (remaining.startsWith("$") && registers.contains(remaining)) {
+                                currentInstruction = instruction;
+                                lineRegisters.add(remaining);
+                                together = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (!together) {
+                        continue; // If it's not a label, keyword, register, or valid concatenation, skip it
+                    }
+                
                 }
             }
 
@@ -104,4 +122,3 @@ public class TwoPassAssembler {
     }
 
 }
-
