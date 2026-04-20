@@ -28,21 +28,22 @@ Description:
 
 For this lab, you will write a 2-pass assembler in Java.  This assembler will load in MIPS assembly files and output the corresponding machine code (to the screen). The input to your assembler will be MIPS assembly files with comments, labels, and whitespace (spaces and tabs).  Assume the following regarding the input:
 
-1\. Comments - Comments start with '#'.  A comment will start at the beginning of a line or may appear after an instruction (on the same line).  If a comment appears after an instruction, there may be whitespace before the '#' symbol.
+
+<!-- 1\. Comments - Comments start with '#'.  A comment will start at the beginning of a line or may appear after an instruction (on the same line).  If a comment appears after an instruction, there may be whitespace before the '#' symbol. -->
 
 2\.  Labels - Labels will only contain alphanumeric characters (0-9, a-z, and A-Z).  There will be no other symbols in the labels.  A colon ':' will appear after a label.  There may be whitespace before a label and the label may be followed by an instruction. A label may appear on a line without an instruction.
 
-3\.  Blank lines may contain a mixture of whitespace characters.
+<!-- 3\.  Blank lines may contain a mixture of whitespace characters. -->
 
-4\.  There may be some whitespace between operands. 
+<!-- 4\.  There may be some whitespace between operands.  -->
 
 
 
 5\.  Immediate values may be negative.
 
-6\.  Your assembler must support the following instructions:  and, or, add, addi, sll, sub, slt, beq, bne, lw, sw, j, jr, and jal.
+<!-- 6\.  Your assembler must support the following instructions:  and, or, add, addi, sll, sub, slt, beq, bne, lw, sw, j, jr, and jal. -->
 
-7\. You do NOT need to support the following registers: $at, $k0, $k1, $gp, $fp.
+<!-- 7\. You do NOT need to support the following registers: $at, $k0, $k1, $gp, $fp. -->
 
 8\. On the same line, whitespace may appear between a label and an instruction. There will always be whitespace between j/jal instructions and the target label.
 
