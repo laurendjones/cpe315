@@ -47,7 +47,7 @@ For this lab, you will write a 2-pass assembler in Java.  This assembler will lo
 
 <!-- 8\. On the same line, whitespace may appear between a label and an instruction. There will always be whitespace between j/jal instructions and the target label. -->
 
-9\. Your program should error check for invalid instructions.  This assembler will be used in future lab assignments, so you may wish to create data structures to store the instructions. 
+<!-- 9\. Your program should error check for invalid instructions.  This assembler will be used in future lab assignments, so you may wish to create data structures to store the instructions. -->
 
 Implementation:
 

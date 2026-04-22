@@ -48,6 +48,9 @@ public class TwoPassAssembler {
         // Key: Line number | Value: Label name 
         Map<Integer, String> labelMap = new HashMap<>();
 
+        // Key: Line number | Value: Invalid instructions + registers
+        Map<Integer, String> invalidInstructionsMap = new HashMap<>();
+
         int addressCounter = 0;
 
         System.out.println("\n ---- Cleaned Code (Comments Stripped): ---- ");
@@ -117,7 +120,11 @@ public class TwoPassAssembler {
                         if (isJumpOrBranch) {
                             lineContent += word + "";
                         } else {
-                        System.out.println("Warning: Unrecognized token '" + word + "' in line: " + line);
+                            System.out.println("Warning: Unrecognized token '" + word + "' in line: " + line + "\n");
+                            isInstructionLine = false;
+                            
+                            lineContent = line;
+                            invalidInstructionsMap.put(addressCounter, lineContent.trim());
                         }
                     }
                 }
@@ -154,9 +161,20 @@ public class TwoPassAssembler {
                 System.out.println("  Line " + (address/4) + " | " + "  Address " + address + " | " + instructionMap.get(address));
             });
         }
+
+        System.out.println("\ninvalidInstructionsMap Table (Line | Invalid Instruction):");
+        if (invalidInstructionsMap.isEmpty()) {
+            System.out.println("  (No instructions found)");
+        } else {
+            // Sorts by address so the program prints in the correct order
+            invalidInstructionsMap.keySet().stream().sorted().forEach(address -> {
+                System.out.println("  Line " + (address/4) + " | " + "  Address " + address + " | " + invalidInstructionsMap.get(address));
+            });
+        }
+
         System.out.println("\n--------------------------\n");
 
-        // 5. Return thge results
+        // 5. Return the results
         Map<String, Object> results = new HashMap<>();
         results.put("instructions", instructionMap);
         results.put("labels", labelMap);
