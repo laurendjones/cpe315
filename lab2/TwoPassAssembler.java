@@ -42,13 +42,13 @@ public class TwoPassAssembler {
         // 7. Need to support 27/32 registers. You do NOT need to support the following registers: $at, $k0, $k1, $gp, $fp.
         Set<String> registers = new HashSet<>(Arrays.asList("$zero", "$v0", "$v1", "$a0", "$a1", "$a2", "$a3", "$t0", "$t1", "$t2", "$t3", "$t4", "$t5", "$t6", "$t7", "$s0", "$s1", "$s2", "$s3", "$s4", "$s5", "$s6", "$s7", "$t8", "$t9", "$sp", "$ra"));
 
-        // Key: Line number | Value: Instruction + registers 
+        // Key: Address number | Value: Instruction + registers 
         Map<Integer, String> instructionMap = new HashMap<>(); 
         
-        // Key: Line number | Value: Label name 
+        // Key: Address number | Value: Label name 
         Map<Integer, String> labelMap = new HashMap<>();
 
-        // Key: Line number | Value: Invalid instructions + registers
+        // Key: Address number | Value: Invalid instructions + registers
         Map<Integer, String> invalidInstructionsMap = new HashMap<>();
 
         int addressCounter = 0;
@@ -103,6 +103,7 @@ public class TwoPassAssembler {
                 if (word.endsWith(":")) { // words ending with ':'
                     String labelName = word.substring(0, word.length() - 1); // Remove the colon to get the label name
                     labelMap.put(addressCounter, labelName);
+                    addressCounter += 4;
                 } else if (keywords.contains(word)) {
                     isInstructionLine = true;
                     lineContent += word + " ";
@@ -111,6 +112,7 @@ public class TwoPassAssembler {
                 } else {
                     try {
                         Integer.parseInt(word); // Check if it's a number (immediate value)
+                        lineContent += word + " ";
                     } catch (NumberFormatException e) {
                         boolean isJumpOrBranch = lineContent.startsWith("j") ||
                                                  lineContent.startsWith("jal") ||
@@ -118,17 +120,22 @@ public class TwoPassAssembler {
                                                  lineContent.startsWith("beq") ||
                                                  lineContent.startsWith("bne");
                         if (isJumpOrBranch) {
-                            lineContent += word + "";
-                        } else {
-                            System.out.println("Warning: Unrecognized token '" + word + "' in line: " + line + "\n");
-                            isInstructionLine = false;
-                            
-                            lineContent = line;
-                            invalidInstructionsMap.put(addressCounter, lineContent.trim());
+                            if (registers.contains(word) || (!word.contains("$") && !Character.isDigit(word.charAt(0)))) {
+                                lineContent += word + "";
+                            } else {
+                                System.out.println("Warning: Unrecognized token '" + word + "' in line: " + line + "\n");
+                                isInstructionLine = false;
+                                
+                                invalidInstructionsMap.put(addressCounter, line.trim());
+                                
+                                addressCounter +=4;
+                                break;
+                            }
                         }
                     }
                 }
             }
+
             // 3. Map keywords + registers together
             if (isInstructionLine) {                    
                 instructionMap.put(addressCounter, lineContent.trim());
@@ -147,8 +154,8 @@ public class TwoPassAssembler {
             System.out.println("  (No labels found)");
         } else {
             // Iterates through labels and prints name and address
-            labelMap.forEach((label, address) -> {
-                System.out.println("  " + address + " : " + address);
+            labelMap.forEach((address, label) -> {
+                System.out.println("Address: " + address + " : " + label);
             });
         }
 
