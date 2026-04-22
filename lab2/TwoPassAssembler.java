@@ -190,11 +190,50 @@ public class TwoPassAssembler {
 
     // Pass 2:
     // During the second pass, all the instructions are converted to machine code
-    public static void pass2(Map<Integer, String> instructions, Map<Integer, String> labels) {
+    public static void pass2(Map<Integer, String> instructionsPass1, Map<Integer, String> labelsPass1) {
+        List<Integer> sortedAddresses = new ArrayList<>(instructionsPass1.keySet());
 
+        for (Integer address : sortedAddresses) {
+            // 1. Get string
+            String instruction = instructionsPass1.get(address);
+
+            // 2. Split the string (Opcode, Registers, Immediates/Labels)
+            String[] splitInstruction = instruction.split("\\s+");
+            String opcode = splitInstruction[0];
+
+            // 3. Identify opcode
+            // R-Type : opcode rs rt rd shamt funct
+            if (opcode.equals("add") || opcode.equals("sub") || opcode.equals("or") || opcode.equals("and") || opcode.equals("slt")) {
+                String rd = splitInstruction[1];
+                String rs = splitInstruction[2];
+                String rt = splitInstruction[3];
+
+                System.out.println("Processing opcode [ " + opcode + " " + rd + " " + rs + " " + rt + " ] at address " + address);
+            }
+            // I-Type : opcode rs rt immediate
+            else if (opcode.equals("addi") || opcode.equals("lw") || opcode.equals("sw") ) {
+
+            }
+            // Branch : I-type with label lookup
+            else if (opcode.equals("beq") || opcode.equals("bne")) {
+
+            }
+            // J-Type : Jump
+            else if ((opcode.equals("j")) || opcode.equals("jal")) {
+
+            }
+        }
+
+            // 4. Lookup label
+            // 5. Calculate Offset
+            // 6. Store machine code ouput
+
+            // Print output
+        
     }
 
     public static void printToScreen() {}
+    // Print output to screen (make new file)
 
     public static void main(String[] args) {
         // Read File
