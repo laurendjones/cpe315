@@ -63,11 +63,18 @@ public class TwoPassAssembler {
             // Add space 
             for (String instruction : keywords) {
                 if (line.startsWith(instruction)) {
-                    if (line.length() > instruction.length()) {
-                        char nextChar = line.charAt(instruction.length());
-                        // If next char is not whitespace, insert a space
-                        if (!Character.isWhitespace(nextChar)) {
-                            line = instruction + " " + line.substring(instruction.length());
+                    if (line.startsWith(instruction)) {
+                        int len = instruction.length();
+
+                        if (line.length() > len) {
+                            char nextChar = line.charAt(len);
+
+                            // Only add a space if the next character is NOT whitespace                        }
+                            // If next char is not whitespace, insert a space
+                            if (!Character.isWhitespace(nextChar) && !Character.isLetter(nextChar)) {
+                                line = instruction + " " + line.substring(instruction.length());
+                                break;
+                            }
                         }
                     }
                 }
@@ -92,16 +99,21 @@ public class TwoPassAssembler {
                     isInstructionLine = true;
                     lineContent += word + " ";
                 } else if (registers.contains(word)) {
-                    lineContent += (word + "");
+                    lineContent += word + " ";
                 } else {
                     try {
                         int imm = Integer.parseInt(word); // Check if it's a valid integer
                     } catch (NumberFormatException e) {
+                        boolean isJumpOrBranch = lineContent.startsWith("j") ||
+                                                 lineContent.startsWith("jal") ||
+                                                 lineContent.startsWith("jr") ||
+                                                 lineContent.startsWith("beq") ||
+                                                 lineContent.startsWith("bne");
+                        if (isJumpOrBranch) {
+                            lineContent += word + "";
+                        } else {
                         System.out.println("Warning: Unrecognized token '" + word + "' in line: " + line);
-                    }
-                    //Need to check for invalid instructions or registers
-                    if (!currentInstruction.equals("j") && !currentInstruction.equals("jr") && !currentInstruction.equals("jal")) {
-                        System.out.println("Warning: Unrecognized token '" + word + "' in line: " + line);
+                        }
                     }
                 }
             }
@@ -109,7 +121,7 @@ public class TwoPassAssembler {
                 // Map keywords + registers together
                 if (isInstructionLine) {                    
                     instructionMap.put(addressCounter, lineContent.trim());
-                    System.out.println(addressCounter + ": " + lineContent.trim());
+                    System.out.println(addressCounter + ": " + lineContent.trim() + "\n");
                     
                     addressCounter += 4; 
                 }
@@ -119,7 +131,7 @@ public class TwoPassAssembler {
         // Print output
         System.out.println("\n ----- Pass 1 ----");
 
-        System.out.println("\nSymbol Table (Label : Line):");
+        System.out.println("\nlabelMap Table (Label : Line):");
         if (labelMap.isEmpty()) {
             System.out.println("  (No labels found)");
         } else {
@@ -129,7 +141,7 @@ public class TwoPassAssembler {
             });
         }
 
-        System.out.println("\nInstruction Table (Line | Instruction):");
+        System.out.println("\ninstructionMap Table (Line | Instruction):");
         if (instructionMap.isEmpty()) {
             System.out.println("  (No instructions found)");
         } else {
