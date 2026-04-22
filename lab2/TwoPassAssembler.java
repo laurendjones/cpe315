@@ -13,6 +13,7 @@ import java.util.Set;
 
 public class TwoPassAssembler {
 
+    // Method to read in the file
     public static List<String> readFile (String filename) {
         List<String> fileLines = new ArrayList<>(); 
         System.out.println("\n ---- File contents: ----");
@@ -31,7 +32,9 @@ public class TwoPassAssembler {
         return fileLines;
     }
 
-    public static void processInput(List<String> fileLines) {
+    // Pass 1: 
+    // The first pass should run through all the lines of the file to compute the address of each label.  
+    public static Map<String, Object> pass1(List<String> fileLines) {
 
         // 6.  Your assembler must support the following instructions:  and, or, add, addi, sll, sub, slt, beq, bne, lw, sw, j, jr, and jal.
         Set<String> keywords = new HashSet<>(Arrays.asList("and", "or", "addi", "add", "sll", "sub", "slt", "beq", "bne", "lw", "sw", "jal", "jr", "j"));
@@ -90,7 +93,7 @@ public class TwoPassAssembler {
             boolean isInstructionLine = false;
             String lineContent = "";
 
-            // Looking for keywords, registers, and labels in the cleaned line
+            // 2. Search for keywords, registers, and labels in the cleaned line
             for (String word : tokens) {
                 if (word.isEmpty()) continue; // Skip empty strings from extra spaces
 
@@ -119,18 +122,17 @@ public class TwoPassAssembler {
                     }
                 }
             }
-            
-                // Map keywords + registers together
-                if (isInstructionLine) {                    
-                    instructionMap.put(addressCounter, lineContent.trim());
-                    System.out.println(addressCounter + ": " + lineContent.trim() + "\n");
+            // 3. Map keywords + registers together
+            if (isInstructionLine) {                    
+                instructionMap.put(addressCounter, lineContent.trim());
+                System.out.println(addressCounter + ": " + lineContent.trim() + "\n");
                     
-                    addressCounter += 4; 
-                }
+                addressCounter += 4; 
+            }
             
         }
 
-        // Print output
+        // 4. Print output
         System.out.println("\n ----- Pass 1 ----");
 
         System.out.println("\nlabelMap Table (Label : Line):");
@@ -153,12 +155,38 @@ public class TwoPassAssembler {
             });
         }
         System.out.println("\n--------------------------\n");
+
+        // 5. Return thge results
+        Map<String, Object> results = new HashMap<>();
+        results.put("instructions", instructionMap);
+        results.put("labels", labelMap);
+        return results;
     }
 
+    // Pass 2:
+    // During the second pass, all the instructions are converted to machine code
+    public static void pass2(Map<Integer, String> instructions, Map<Integer, String> labels) {
+
+    }
+
+    public static void printToScreen() {}
 
     public static void main(String[] args) {
+        // Read File
         List<String> fileLines = readFile("lab2/testprog1.asm");
-        processInput(fileLines);
+        
+        // Pass 1:
+        Map<String, Object> pass1Results = pass1(fileLines);
+
+        // Extract Maps
+        Map<Integer, String> instructions = (Map<Integer, String>) pass1Results.get("instructions"));
+        Map<Integer, String> labels = (Map<Integer, String>) pass1Results.get("labels"));
+
+        // Pass 2:
+        pass2(instructions, labels);
+
+        // Print to screen
+        printToScreen();
     }
 
 }
