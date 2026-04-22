@@ -39,29 +39,28 @@ public class TwoPassAssembler {
         // 7. Need to support 27/32 registers. You do NOT need to support the following registers: $at, $k0, $k1, $gp, $fp.
         Set<String> registers = new HashSet<>(Arrays.asList("$zero", "$v0", "$v1", "$a0", "$a1", "$a2", "$a3", "$t0", "$t1", "$t2", "$t3", "$t4", "$t5", "$t6", "$t7", "$s0", "$s1", "$s2", "$s3", "$s4", "$s5", "$s6", "$s7", "$t8", "$t9", "$sp", "$ra"));
 
-        // Key: Instruction name | Value: List of registers used in that instruction
-        Map<String, List<String>> instructionMap = new HashMap<>(); 
+        // Key: Line number | Value: Instruction + registers 
+        Map<Integer, String> instructionMap = new HashMap<>(); 
         
-        // Key: Label name | Value: List of line addresses where the label is referenced 
-        Map<String, List<String>> labelMap = new HashMap<>();
+        // Key: Line number | Value: Label name 
+        Map<Integer, String> labelMap = new HashMap<>();
 
         int addressCounter = 0;
 
-        // To keep track of the most recent label for mapping purposes
-        String activeLabel = null; 
         System.out.println("\n ---- Cleaned Code (Comments Stripped): ---- ");
 
         for (String line : fileLines) {
-            // Strip comments
+            // 1. Code cleanup
+            //  Strip comments
             int commentIndex = line.indexOf('#');
             if (commentIndex != -1) {
                 line = line.substring(0, commentIndex); // Remove comments from the line
             }
-
-            // Clean up whitespace 
+            // Trim
             line = line.trim();
             if (line.isEmpty()) continue; // Skip empty lines after trimming
 
+            // Add space 
             for (String instruction : keywords) {
                 if (line.startsWith(instruction)) {
                     if (line.length() > instruction.length()) {
@@ -73,13 +72,14 @@ public class TwoPassAssembler {
                     }
                 }
             }
+
             System.out.println(line); // Print the cleaned line
 
             // Split line into tokens
             String[] tokens = line.split("[\\s,()]+");
 
-            String currentInstruction = null;
-            List<String> lineRegisters = new ArrayList<>();
+            boolean isInstructionLine = false;
+            String lineContent = "";
 
             // Looking for keywords, registers, and labels in the cleaned line
             for (String word : tokens) {
@@ -91,39 +91,60 @@ public class TwoPassAssembler {
                     System.out.println("Warning: Unrecognized token '" + word + "' in line: " + line);
                 }
                 if (word.endsWith(":")) { // words ending with ':'
-                    activeLabel = word.substring(0, word.length() - 1); // Remove the colon to get the label name
-                    labelMap.put(activeLabel, new ArrayList<>());
-                    labelMap.get(activeLabel).add(String.valueOf(addressCounter)); // Add the address of the label
-
+                    String labelName = word.substring(0, word.length() - 1); // Remove the colon to get the label name
+                    labelMap.put(addressCounter, labelName);
                 } else if (keywords.contains(word)) {
-                    currentInstruction = word;
-                    addressCounter += 4; // Increment address counter for each instruction
+                    isInstructionLine = true;
+                    lineContent += word + " ";
                 } else if (registers.contains(word)) {
-                    lineRegisters.add(word);
+                    lineContent += (word + "");
                 } else {
-                    //Need to check for invalid instructions or registers
-                    if (!currentInstruction.equals("j") && !currentInstruction.equals("jr") && !currentInstruction.equals("jal")) {
-                        System.out.println("Warning: Unrecognized token '" + word + "' in line: " + line);
+                    // Check if it's an immediate/numeric value
+                    try {
+                        Integer.parseInt(word);
+                        lineContent += word + " ";
+                    } catch (NumberFormatException e) {
+                        // This could be a label reference (like in 'j' or 'beq')
+                        lineContent += word + " ";
                     }
                 }
-            
-
-            // Map keywords + registers together
-            if (currentInstruction != null) {
-                if (instructionMap.containsKey(currentInstruction)) {
-                    instructionMap.get(currentInstruction).addAll(lineRegisters);
-                } else {
-                    instructionMap.put(currentInstruction, new ArrayList<>(lineRegisters));
-                }
             }
+            
+                // Map keywords + registers together
+                if (isInstructionLine) {                    
+                    instructionMap.put(addressCounter, lineContent.trim());
+                    System.out.println(addressCounter + ": " + lineContent.trim());
+                    
+                    addressCounter += 4; 
+                }
+            
         }
-            // Print output
-            System.out.println("\n ----- Pass 1: ----");
-            System.out.println("Symbol table (Labels -> Addresses: ) ");
-            System.out.println(labelMap);
-            System.out.println("Instruction table (Instructions -> Registers: ) ");
-            System.out.println(instructionMap + "\n\n");
+
+        // Print output
+        System.out.println("\n ----- Pass 1 ----");
+
+        System.out.println("\nSymbol Table (Label : Line):");
+        if (labelMap.isEmpty()) {
+            System.out.println("  (No labels found)");
+        } else {
+            // Iterates through labels and prints name and address
+            labelMap.forEach((label, address) -> {
+                System.out.println("  " + address + " : " + address);
+            });
+        }
+
+        System.out.println("\nInstruction Table (Line | Instruction):");
+        if (instructionMap.isEmpty()) {
+            System.out.println("  (No instructions found)");
+        } else {
+            // Sorts by address so the program prints in the correct order
+            instructionMap.keySet().stream().sorted().forEach(address -> {
+                System.out.println("  Line " + (address/4) + " | " + "  Address " + address + " | " + instructionMap.get(address));
+            });
+        }
+        System.out.println("\n--------------------------\n");
     }
+
 
     public static void main(String[] args) {
         List<String> fileLines = readFile("lab2/testprog1.asm");
