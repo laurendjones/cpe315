@@ -179,8 +179,8 @@ public class TwoPassAssembler {
         Map<String, Object> pass1Results = pass1(fileLines);
 
         // Extract Maps
-        Map<Integer, String> instructions = (Map<Integer, String>) pass1Results.get("instructions"));
-        Map<Integer, String> labels = (Map<Integer, String>) pass1Results.get("labels"));
+        Map<Integer, String> instructions = (Map<Integer, String>) pass1Results.get("instructions");
+        Map<Integer, String> labels = (Map<Integer, String>) pass1Results.get("labels");
 
         // Pass 2:
         pass2(instructions, labels);
