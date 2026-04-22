@@ -85,11 +85,6 @@ public class TwoPassAssembler {
             for (String word : tokens) {
                 if (word.isEmpty()) continue; // Skip empty strings from extra spaces
 
-                try {
-                    int imm = Integer.parseInt(word); // Check if it's a valid integer
-                } catch (NumberFormatException e) {
-                    System.out.println("Warning: Unrecognized token '" + word + "' in line: " + line);
-                }
                 if (word.endsWith(":")) { // words ending with ':'
                     String labelName = word.substring(0, word.length() - 1); // Remove the colon to get the label name
                     labelMap.put(addressCounter, labelName);
@@ -99,13 +94,14 @@ public class TwoPassAssembler {
                 } else if (registers.contains(word)) {
                     lineContent += (word + "");
                 } else {
-                    // Check if it's an immediate/numeric value
                     try {
-                        Integer.parseInt(word);
-                        lineContent += word + " ";
+                        int imm = Integer.parseInt(word); // Check if it's a valid integer
                     } catch (NumberFormatException e) {
-                        // This could be a label reference (like in 'j' or 'beq')
-                        lineContent += word + " ";
+                        System.out.println("Warning: Unrecognized token '" + word + "' in line: " + line);
+                    }
+                    //Need to check for invalid instructions or registers
+                    if (!currentInstruction.equals("j") && !currentInstruction.equals("jr") && !currentInstruction.equals("jal")) {
+                        System.out.println("Warning: Unrecognized token '" + word + "' in line: " + line);
                     }
                 }
             }
