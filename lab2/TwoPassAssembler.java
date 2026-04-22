@@ -43,7 +43,7 @@ public class TwoPassAssembler {
         Map<String, List<String>> instructionMap = new HashMap<>(); 
         
         // Key: Label name | Value: List of line addresses where the label is referenced 
-        Map<String, List<String>> labelMap = new HashMap<>();
+        Map<String, List<String, Integer>> labelMap = new HashMap<>();
 
         int addressCounter = 0;
 
@@ -85,22 +85,21 @@ public class TwoPassAssembler {
             for (String word : tokens) {
                 if (word.isEmpty()) continue; // Skip empty strings from extra spaces
 
-                try {
-                    int imm = Integer.parseInt(word); // Check if it's a valid integer
-                } catch (NumberFormatException e) {
-                    System.out.println("Warning: Unrecognized token '" + word + "' in line: " + line);
-                }
                 if (word.endsWith(":")) { // words ending with ':'
                     activeLabel = word.substring(0, word.length() - 1); // Remove the colon to get the label name
-                    labelMap.put(activeLabel, new ArrayList<>());
-                    labelMap.get(activeLabel).add(String.valueOf(addressCounter)); // Add the address of the label
+                    labelMap.put(activeLabel, addressCounter, new ArrayList<>());
+                     // Add the address of the label
 
                 } else if (keywords.contains(word)) {
                     currentInstruction = word;
-                    addressCounter += 4; // Increment address counter for each instruction
                 } else if (registers.contains(word)) {
                     lineRegisters.add(word);
                 } else {
+                    try {
+                        int imm = Integer.parseInt(word); // Check if it's a valid integer
+                    } catch (NumberFormatException e) {
+                        System.out.println("Warning: Unrecognized token '" + word + "' in line: " + line);
+                    }
                     //Need to check for invalid instructions or registers
                     if (!currentInstruction.equals("j") && !currentInstruction.equals("jr") && !currentInstruction.equals("jal")) {
                         System.out.println("Warning: Unrecognized token '" + word + "' in line: " + line);
