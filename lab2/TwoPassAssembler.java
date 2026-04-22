@@ -34,7 +34,7 @@ public class TwoPassAssembler {
     public static void processInput(List<String> fileLines) {
 
         // 6.  Your assembler must support the following instructions:  and, or, add, addi, sll, sub, slt, beq, bne, lw, sw, j, jr, and jal.
-        Set<String> keywords = new HashSet<>(Arrays.asList("and", "or", "add", "addi", "sll", "sub", "slt", "beq", "bne", "lw", "sw", "j", "jr", "jal"));
+        Set<String> keywords = new HashSet<>(Arrays.asList("and", "or", "addi", "add", "sll", "sub", "slt", "beq", "bne", "lw", "sw", "jal", "jr", "j"));
         
         // 7. Need to support 27/32 registers. You do NOT need to support the following registers: $at, $k0, $k1, $gp, $fp.
         Set<String> registers = new HashSet<>(Arrays.asList("$zero", "$v0", "$v1", "$a0", "$a1", "$a2", "$a3", "$t0", "$t1", "$t2", "$t3", "$t4", "$t5", "$t6", "$t7", "$s0", "$s1", "$s2", "$s3", "$s4", "$s5", "$s6", "$s7", "$t8", "$t9", "$sp", "$ra"));
@@ -43,7 +43,7 @@ public class TwoPassAssembler {
         Map<String, List<String>> instructionMap = new HashMap<>(); 
         
         // Key: Label name | Value: List of line addresses where the label is referenced 
-        Map<String, List<String, Integer>> labelMap = new HashMap<>();
+        Map<String,Integer> labelMap = new HashMap<>();
 
         int addressCounter = 0;
 
@@ -62,17 +62,21 @@ public class TwoPassAssembler {
             line = line.trim();
             if (line.isEmpty()) continue; // Skip empty lines after trimming
 
-            for (String instruction : keywords) {
-                if (line.startsWith(instruction)) {
-                    if (line.length() > instruction.length()) {
-                        char nextChar = line.charAt(instruction.length());
+            for(int i = line.length(); i > 0; i--) {
+                String inst = line.substring(0, i);
+                if (keywords.contains(inst)) {
+                    if (line.length() > inst.length()) {
+                        char nextChar = line.charAt(inst.length());
                         // If next char is not whitespace, insert a space
                         if (!Character.isWhitespace(nextChar)) {
-                            line = instruction + " " + line.substring(instruction.length());
+                            line = inst + " " + line.substring(inst.length());
                         }
                     }
+                    break;   
                 }
+
             }
+            
             System.out.println(line); // Print the cleaned line
 
             // Split line into tokens
@@ -87,8 +91,7 @@ public class TwoPassAssembler {
 
                 if (word.endsWith(":")) { // words ending with ':'
                     activeLabel = word.substring(0, word.length() - 1); // Remove the colon to get the label name
-                    labelMap.put(activeLabel, addressCounter, new ArrayList<>());
-                     // Add the address of the label
+                    labelMap.put(activeLabel, addressCounter); // Add the address of the label
 
                 } else if (keywords.contains(word)) {
                     currentInstruction = word;
@@ -96,16 +99,20 @@ public class TwoPassAssembler {
                     lineRegisters.add(word);
                 } else {
                     try {
-                        int imm = Integer.parseInt(word); // Check if it's a valid integer
+                        Integer.parseInt(word); // Check if it's a number (immediate value)
                     } catch (NumberFormatException e) {
-                        System.out.println("Warning: Unrecognized token '" + word + "' in line: " + line);
-                    }
-                    //Need to check for invalid instructions or registers
-                    if (!currentInstruction.equals("j") && !currentInstruction.equals("jr") && !currentInstruction.equals("jal")) {
-                        System.out.println("Warning: Unrecognized token '" + word + "' in line: " + line);
+                        // If it's not a number, it could be a label reference
+                        if (!(currentInstruction != null &&
+                            (currentInstruction.equals("j") || 
+                            currentInstruction.equals("jal") || 
+                            currentInstruction.equals("beq") || 
+                            currentInstruction.equals("bne")
+                        ))) {
+                            System.out.println("Warning: Unrecognized token '" + word + "' in line: " + line);
+                        }
                     }
                 }
-            
+            }
 
             // Map keywords + registers together
             if (currentInstruction != null) {
