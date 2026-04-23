@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
 
-public class TwoPassAssembler {
+public class lab2 {
 
     public static final Map<String, Integer> Register_map = new HashMap<>();
     static {
@@ -348,7 +348,12 @@ public class TwoPassAssembler {
 
     public static void main(String[] args) {
         // Read File
-        List<String> fileLines = readFile("lab2/testprog4.asm");
+        if (args.length < 1) {
+            System.out.println("Usage: java lab2 file.asm");
+            System.exit(1);
+        }
+
+        List<String> fileLines = readFile(args[0]);
         
         // Pass 1:
         Map<String, Object> pass1Results = pass1(fileLines);
