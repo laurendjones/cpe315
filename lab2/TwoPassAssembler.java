@@ -375,7 +375,7 @@ public class TwoPassAssembler {
             else if (opcode.equals("jr")) {
                 int rs = reg(splitInstruction[1]);
 
-                encoded = encodeRType(rs, 0, 0, 0, FUNCT_MAP.get(opcode));
+                encoded = encodeRType(rs, 0, 0,0, FUNCT_MAP.get(opcode));
                 // System.out.println("Processing opcode [ " + opcode + " " + rs + " ] at address " + address);
             } else {
                     System.out.println("Error: Unrecognized opcode '" + opcode + "' in instruction: " + instruction);
@@ -389,13 +389,42 @@ public class TwoPassAssembler {
     return machineCode;
         
     }
+    public static String formatBinaryByType(String instruction, int word) {
+    String bin = toBinary(word);
+    String opcode = instruction.split("\\s+")[0];
 
-    public static void printToScreen(Map<Integer, String> machineCode) {
+    // R-type
+        if (opcode.equals("add") || opcode.equals("sub") || opcode.equals("and") || opcode.equals("or") || opcode.equals("slt") || opcode.equals("sll") || opcode.equals("jr")) {
+            return bin.substring(0, 6) + " " +
+                bin.substring(6, 11) + " " +
+                bin.substring(11, 16) + " " +
+                bin.substring(16, 21) + " " +
+                bin.substring(21, 26) + " " +
+                bin.substring(26, 32);
+        }
+
+        // J-type
+        else if (opcode.equals("j") || opcode.equals("jal")) {
+            return bin.substring(0, 6) + " " +
+                bin.substring(6, 32);
+        }
+
+        // I-type
+        else {
+            return bin.substring(0, 6) + " " +
+                bin.substring(6, 11) + " " +
+                bin.substring(11, 16) + " " +
+                bin.substring(16, 32);
+        }
+}
+
+    public static void printToScreen(Map<Integer, String> machineCode, Map<Integer, String> instructions) {
         machineCode.keySet().stream().sorted().forEach(addr -> {
-            String hex = machineCode.get(addr);
-            long val = Long.parseLong(hex, 16);
-            System.out.printf("0x%04X %s %s%n",
-                addr, hex, toBinary((int) val));
+        String hex = machineCode.get(addr);
+        int word = (int) Long.parseLong(hex, 16);
+        String instruction = instructions.get(addr);
+
+        System.out.println(formatBinaryByType(instruction, word));
         });
     }
     // Print output to screen (make new file)
@@ -403,7 +432,7 @@ public class TwoPassAssembler {
 
     public static void main(String[] args) {
         // Read File
-        List<String> fileLines = readFile("lab2/testprog1.asm");
+        List<String> fileLines = readFile("lab2/testprog4.asm");
         
         // Pass 1:
         Map<String, Object> pass1Results = pass1(fileLines);
@@ -416,7 +445,7 @@ public class TwoPassAssembler {
         Map<Integer, String> machineCode = pass2(instructions, labels);
 
         // Print to screen
-        printToScreen(machineCode);
+        printToScreen(machineCode, instructions);
     }
 
 }
