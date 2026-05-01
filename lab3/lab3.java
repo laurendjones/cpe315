@@ -1,6 +1,7 @@
 package lab3;
 
-import java.util.Scanner;
+   // import java.util.*;
+   // import java.io.*;
 
 public class lab3 {
 
@@ -86,5 +87,19 @@ public class lab3 {
 
     public static void main (String[] args) {
         // Your program should run from the command line with 1 optional argument: java lab3 assembly_file.asm script_file
+        if (args.length < 1) {
+            System.out.println("Usage: java lab3 assembly_file.asm [script_file]");
+            return;
+        }
+
+        // 1. Load and Parse assembly_file.asm using your Lab 2 code here
+        
+        /* // 2. Check for script file
+        if (args.length == 2) {
+            runScriptMode(args[1]);
+        } else {
+            runInteractiveMode();
+        } */
+    //}
     }
 }
