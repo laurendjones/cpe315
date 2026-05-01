@@ -1,13 +1,12 @@
 package lab3;
-
-   // import java.util.*;
+// import java.util.*;
    // import java.io.*;
 
 public class lab3 {
 
-    public int[] reg = new int[32]; 
-    public int[] mem;                     
-    public int pc = 0;
+    public static int[] reg = new int[32]; 
+    public static int[] mem;                     
+    public static int pc = 0;
     public static final int memSize = 8192;
 
     public static void printHelp() {
@@ -21,18 +20,16 @@ public class lab3 {
         System.out.println("q = exit the program");
     }
 
-    public static void dumpRegisterState(int[] reg) {
-        for (int i = 0; i < reg.length; i++) {
-            System.out.println("R" + i + ": " + reg[i]);
-        }
+    public static void dumpRegisters() {
+        System.out.println("\npc = " + pc);
+        System.out.printf("$0 = %-10d $v0 = %-10d $v1 = %-10d $a0 = %-10d\n", reg[0], reg[2], reg[3], reg[4]);
+        System.out.printf("$a1 = %-10d $a2 = %-10d $a3 = %-10d $t0 = %-10d\n", reg[5], reg[6], reg[7], reg[8]);
+        //continue for all registers based on the MIPS register map
+        System.out.println();
     }
 
-    public static void interactiveMode() {
-        // display prompt
-        Scanner input = new Scanner(System.in);
-        
-        System.out.println("mips>");
-        String command = input.nextLine(); // Read String input
+    public void executeCommand(String command) {
+
 
         // The program should accept the following commands:
         // h = show help
@@ -44,47 +41,40 @@ public class lab3 {
         // c = clear all registers, memory, and the program counter to 0
         // q = exit the program
 
-        if ((command == "h") || (command == "d") || (command == "s") || (command == "s num") || (command == "r") || (command == "m num1 num2") || (command == "c") || (command == "q")) {
-            switch (command) {
-                case "h":
-                    printHelp();
-                    break;
-                case "d":
-                    // dump register state
-                    break;
-                case "s":
-                    // single step through the program (i.e. execute 1 instruction and stop)
-                    break;
-                case "s num":
-                    // step through num instructions of the program
-                    break;
-                case "r":
-                    // run until the program ends
-                    break;
-                case "m num1 num2":
-                    // display data memory from location num1 to num2
-                    break;
-                case "c":
-                    // clear all registers, memory, and the program counter to 0
-                    break;
-                case "q":
-                    // exit the program
-                    break;
-                default:
-                    break;
-            }
+
+        String[] parts = command.split(" ");
+        switch (parts[0]) {
+            case "h":
+                printHelp();
+                break;
+            case "d":
+                dumpRegisters();
+                break;
+            case "s":
+                // single step through the program (i.e. execute 1 instruction and stop)
+                break;
+            case "s num":
+                // step through num instructions of the program
+                break;
+            case "r":
+                // run until the program ends
+                break;
+            case "m num1 num2":
+                // display data memory from location num1 to num2
+                break;
+            case "c":
+                // clear all registers, memory, and the program counter to 0
+                break;
+            case "q":
+                // exit the program
+                break;
+            default:
+                break;
+        }
     } 
 
-        input.close(); 
-
-
-
-    }
-
     public static void scriptMode() {
-
     }
-
     public static void main (String[] args) {
         // Your program should run from the command line with 1 optional argument: java lab3 assembly_file.asm script_file
         if (args.length < 1) {
