@@ -12,7 +12,7 @@ public class lab3 {
     public static int pc = 0;
     public static final int memSize = 8192;
 
-    public static HashMap<Integer, String> instructionMap = new HashMap<>();
+    public static Map<Integer, String> instructionMap = new HashMap<>();
 
     public static void printHelp() {
         System.out.println("h = show help");
@@ -150,7 +150,7 @@ public class lab3 {
 
 
 
-    public void executeCommand(String command) {
+    public static void executeCommand(String command) {
 
 
         // The program should accept the following commands:
@@ -221,8 +221,34 @@ public class lab3 {
         }
     } 
 
-    public static void scriptMode() {
+    public static void runMode(Scanner scanner, boolean isInteractive) {
+    while (true) {
+        if (isInteractive) {
+            System.out.print("mips> ");
+            System.out.flush();
+        }
+
+        if (!scanner.hasNextLine()) {
+            break; // End of file or input stream
+        }
+
+        String command = scanner.nextLine().trim();
+        
+        // SCRIPT MODE 
+        if (!isInteractive) {
+            System.out.println("mips> " + command);
+        }
+
+        if (command.equals("q")) {
+            break;
+        }
+
+        if (!command.isEmpty()) {
+            executeCommand(command);
+        }
     }
+}
+
     public static void main (String[] args) {
         // Your program should run from the command line with 1 optional argument: java lab3 assembly_file.asm script_file
         if (args.length < 1) {
@@ -230,16 +256,27 @@ public class lab3 {
             return;
         }
 
-        assembler myAssembler = new assembler();
-        Map<Integer, String> parsedInstructions = myAssembler.parseFile(args[0]);
+        clearState();
 
-        // 2. Check for script file vs Interactive mode
-        if (parsedInstructions != null) {
-        // Put the instructions into the static map in lab3
-        instructionMap.putAll(parsedInstructions);
-        } else {
-        System.out.println("Assembly failed.");
-        return;
+        assembler myAssembler = new assembler();
+        instructionMap = myAssembler.parseFile(args[0]);
+
+        try {
+            if (args.length == 2) {
+                // SCRIPT MODE: Read from the file provided in args[1]
+                File scriptFile = new File(args[1]);
+                Scanner scriptScanner = new Scanner(scriptFile);
+                System.out.println("Running in Script Mode...");
+                runMode(scriptScanner, false); 
+            } else {
+                // INTERACTIVE MODE: Read from System.in (Keyboard)
+                Scanner interactiveScanner = new Scanner(System.in);
+                runMode(interactiveScanner, true);
+            }
+        } catch (FileNotFoundException e) {
+            System.out.println("Error: Script file not found.");
         }
     }
+
 }
+
