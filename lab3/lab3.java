@@ -1,9 +1,8 @@
-package lab3;
-
-import lab3.assembler;
-
 import java.util.Map;
+import java.util.Scanner;
 import java.util.List;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.HashMap;
 
 public class lab3 {
@@ -196,14 +195,16 @@ public class lab3 {
             return;
         }
 
-        // 1. Load and Parse assembly_file.asm using your Lab 2 code here
-        
-        /* // 2. Check for script file
-        if (args.length == 2) {
-            runScriptMode(args[1]);
+        assembler myAssembler = new assembler();
+        Map<Integer, String> parsedInstructions = myAssembler.parseFile(args[0]);
+
+        // 2. Check for script file vs Interactive mode
+        if (parsedInstructions != null) {
+        // Put the instructions into the static map in lab3
+        instructionMap.putAll(parsedInstructions);
         } else {
-            runInteractiveMode();
-        } */
-    //}
+        System.out.println("Assembly failed.");
+        return;
+        }
     }
 }

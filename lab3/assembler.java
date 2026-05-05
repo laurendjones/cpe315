@@ -1,5 +1,3 @@
-package lab3;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -345,15 +343,16 @@ public class assembler {
         });
     }
 
+    public Map<Integer, String> parseFile(String filename) {
+    // public static void main(String[] args) {
+    //     // Read File
+    //     if (args.length < 1) {
+    //         System.out.println("Usage: java lab2 file.asm");
+    //         System.exit(1);
+    //     }
 
-    public static void main(String[] args) {
-        // Read File
-        if (args.length < 1) {
-            System.out.println("Usage: java lab2 file.asm");
-            System.exit(1);
-        }
-
-        List<String> fileLines = readFile(args[0]);
+        //List<String> fileLines = readFile(args[0]);
+        List<String> fileLines = readFile(filename);
         
         // Pass 1:
         Map<String, Object> pass1Results = pass1(fileLines);
@@ -375,6 +374,7 @@ public class assembler {
                 System.exit(1);
             }
         }
+        return instructions;
     }
 
 }
