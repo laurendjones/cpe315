@@ -343,7 +343,7 @@ public class assembler {
         });
     }
 
-    public Map<Integer, String> parseFile(String filename) {
+    public Map<String, Object> parseFile(String filename) {
     // public static void main(String[] args) {
     //     // Read File
     //     if (args.length < 1) {
@@ -374,7 +374,11 @@ public class assembler {
                 System.exit(1);
             }
         }
-        return instructions;
+        Map<String, Object> results = new HashMap<>();
+        results.put("labels", labels);
+        results.put("machineCode", machineCode);
+        return results;
+
     }
 
 }

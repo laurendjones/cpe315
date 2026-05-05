@@ -13,6 +13,7 @@ public class lab3 {
     public static final int memSize = 8192;
 
     public static Map<Integer, String> instructionMap = new HashMap<>();
+    public static Map<Integer, String> labelMap = new HashMap<>();
 
     public static void printHelp() {
         System.out.println("h = show help");
@@ -49,7 +50,8 @@ public class lab3 {
                 return false;
         }
         String word = instructionMap.get(pc);
-        int instruction = Integer.parseInt(word);
+        int instruction = (int) Long.parseLong(word, 16);
+        //int instruction = Integer.parseInt(word);
 
         pc += 4;
 
@@ -352,7 +354,12 @@ public class lab3 {
         clearState();
 
         assembler myAssembler = new assembler();
-        instructionMap = myAssembler.parseFile(args[0]);
+
+        // Get assembler result
+        Map<String, Object> assemblerOutput = myAssembler.parseFile(args[0]);
+
+        instructionMap = (Map<Integer, String>) assemblerOutput.get("machineCode");
+        labelMap = (Map<Integer, String>) assemblerOutput.get("labels");
 
         try {
             if (args.length == 2) {
