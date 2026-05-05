@@ -1,3 +1,7 @@
+javac lab3.java assembler.java
+
+java lab3 assembly_file.asm
+
 CPE 315
 
 Spring 2026
