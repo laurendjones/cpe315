@@ -28,7 +28,7 @@ public class lab3 {
     }
 
     public static void dumpRegisters() {
-        System.out.println("\npc = " + pc);
+        System.out.println("\npc = " + (pc / 4));
         System.out.printf("$0 = %-10d $v0 = %-10d $v1 = %-10d $a0 = %-10d\n", reg[0], reg[2], reg[3], reg[4]);
         System.out.printf("$a1 = %-10d $a2 = %-10d $a3 = %-10d $t0 = %-10d\n", reg[5], reg[6], reg[7], reg[8]);
         System.out.printf("$t1 = %-10d $t2 = %-10d $t3 = %-10d $t4 = %-10d\n", reg[9], reg[10], reg[11], reg[12]);
@@ -56,7 +56,7 @@ public class lab3 {
 
     public static boolean executeInstruction() {
         if (!instructionMap.containsKey(pc)) {
-                System.out.println("No instruction at pc: " + pc);
+                //System.out.println("No instruction at pc: " + pc);
                 return false;
         }
     //     String word = instructionMap.get(pc);
@@ -153,7 +153,7 @@ public class lab3 {
             String[] parts = instruction.split(" ");
             String opcode = parts[0];
 
-            pc += 1;
+            pc += 4;
             switch (opcode) {
                 case "add":
                     int rd = assembler.reg(parts[1]);
@@ -199,13 +199,13 @@ public class lab3 {
                     break;
                 case "jr":
                     rs = assembler.reg(parts[1]);
-                    pc = reg[rs];
+                    pc = (reg[rs] * 4);
                     break;
                 case "lw":
                     rt = assembler.reg(parts[1]);
                     int offset = Integer.parseInt(parts[2]);
                     rs = assembler.reg(parts[3]);
-                    int address = (reg[rs] + offset) / 4;
+                    int address = (reg[rs] + offset);
                     if (address < 0 || address >= memSize) {
                         System.out.println("Memory access out of bounds at address: " + address);
                     } else {
@@ -216,7 +216,7 @@ public class lab3 {
                     rt = assembler.reg(parts[1]);
                     offset = Integer.parseInt(parts[2]);
                     rs = assembler.reg(parts[3]);
-                    address = (reg[rs] + offset) / 4;
+                    address = (reg[rs] + offset);
                     if (address < 0 || address >= memSize) {
                         System.out.println("Memory access out of bounds at address: " + address);
                     } else {
@@ -245,7 +245,7 @@ public class lab3 {
                     break;
                 case "jal":
                     label = parts[1];
-                    reg[31] = pc;
+                    reg[31] = (pc / 4);
                     pc = labelToAddress(label);
                     break;
                 default:
@@ -293,16 +293,17 @@ public class lab3 {
                     for (int i = 0; i < num; i++) {
                         executed++;
                         if (!executeInstruction()) {
-                            System.out.println(executed + " instruction(s) executed");
+                            
                             break;
                         }
                     }
+                    System.out.println(executed + " instruction(s) executed");
                 }
                 break;
             case "r":
                 while (executeInstruction()) {
                 }
-                System.out.println("Program has ended");
+                //System.out.println("Program has ended");
                 break;
             case "m":
                 if (parts.length != 3) {
@@ -367,14 +368,14 @@ public class lab3 {
             return;
         }
 
-        clearState();
+        //clearState();
 
         assembler myAssembler = new assembler();
 
         // Get assembler result
         Map<String, Object> assemblerOutput = myAssembler.parseFile(args[0]);
 
-        instructionMap = (Map<Integer, String>) assemblerOutput.get("machineCode");
+        instructionMap = (Map<Integer, String>) assemblerOutput.get("instructions");
         labelMap = (Map<Integer, String>) assemblerOutput.get("labels");
 
 
@@ -387,7 +388,7 @@ public class lab3 {
                 // SCRIPT MODE: Read from the file provided in args[1]
                 File scriptFile = new File(args[1]);
                 Scanner scriptScanner = new Scanner(scriptFile);
-                System.out.println("Running in Script Mode...");
+                //System.out.println("Running in Script Mode...");
                 runMode(scriptScanner, false); 
             } else {
                 // INTERACTIVE MODE: Read from System.in (Keyboard)

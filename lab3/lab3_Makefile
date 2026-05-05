@@ -1,0 +1,27 @@
+JAVAC   = javac
+JAVA    = java
+SRCS    = assembler.java lab3.java
+CLASSES = assembler.class lab3.class
+
+# Default target: compile everything
+all: $(CLASSES)
+
+assembler.class: assembler.java
+	$(JAVAC) assembler.java
+
+lab3.class: lab3.java assembler.class
+	$(JAVAC) lab3.java
+
+# Run interactively: make run ASM=yourfile.asm
+run: $(CLASSES)
+	$(JAVA) lab3 $(ASM)
+
+# Run with a script file: make script ASM=yourfile.asm SCRIPT=yourscript.txt
+script: $(CLASSES)
+	$(JAVA) lab3 $(ASM) $(SCRIPT)
+
+# Remove compiled class files
+clean:
+	rm -f $(CLASSES)
+
+.PHONY: all run script clean

@@ -365,7 +365,7 @@ public class assembler {
         Map<Integer, String> machineCode = pass2(instructions, labels);
 
         // Print to screen
-        printToScreen(machineCode, instructions);
+        //printToScreen(machineCode, instructions);
 
         //handle invalid instructions
         for (String instr : instructions.values()) {
@@ -376,7 +376,7 @@ public class assembler {
         }
         Map<String, Object> results = new HashMap<>();
         results.put("labels", labels);
-        results.put("machineCode", machineCode);
+        results.put("instructions", instructions);
         return results;
 
     }
