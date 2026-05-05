@@ -14,6 +14,7 @@ public class lab3 {
 
     public static Map<Integer, String> instructionMap = new HashMap<>();
     public static Map<Integer, String> labelMap = new HashMap<>();
+    public static Map<String, Integer> newLabelMap = new HashMap<>();
 
     public static void printHelp() {
         System.out.println("h = show help");
@@ -44,200 +45,214 @@ public class lab3 {
         pc = 0;
     }
 
+    public static int labelToAddress(String label) {
+        if (!newLabelMap.containsKey(label)) {
+            System.out.println("Label not found: " + label);
+            System.exit(1);
+        }
+        return newLabelMap.get(label);
+    }
+
     public static boolean executeInstruction() {
         if (!instructionMap.containsKey(pc)) {
                 System.out.println("No instruction at pc: " + pc);
                 return false;
         }
-        String word = instructionMap.get(pc);
-        int instruction = (int) Long.parseLong(word, 16);
-        //int instruction = Integer.parseInt(word);
+    //     String word = instructionMap.get(pc);
+    //     int instruction = (int) Long.parseLong(word, 16);
+    //     //int instruction = Integer.parseInt(word);
 
-        pc += 4;
+    //     pc += 4;
 
-        int opcode = (instruction >>> 26) & 0x3F;
-        int rs = (instruction >>> 21) & 0x1F;
-        int rt = (instruction >>> 16) & 0x1F;
-        int rd = (instruction >>> 11) & 0x1F;
-        int shamt = (instruction >>> 6) & 0x1F;
-        int funct = instruction & 0x3F;
-        int imm = (short)(instruction & 0xFFFF);
-        int address = (instruction & 0x3FFFFFF) * 4;
+    //     int opcode = (instruction >>> 26) & 0x3F;
+    //     int rs = (instruction >>> 21) & 0x1F;
+    //     int rt = (instruction >>> 16) & 0x1F;
+    //     int rd = (instruction >>> 11) & 0x1F;
+    //     int shamt = (instruction >>> 6) & 0x1F;
+    //     int funct = instruction & 0x3F;
+    //     int imm = (short)(instruction & 0xFFFF);
+    //     int address = (instruction & 0x3FFFFFF) * 4;
 
-        if (opcode == 0) {
-            switch (funct) {
-                case 0x20: //add
-                    reg[rd] = reg[rs] + reg[rt];
-                    break;
-                case 0x22: //sub
-                    reg[rd] = reg[rs] - reg[rt];
-                    break;
-                case 0x24: //and
-                    reg[rd] = reg[rs] & reg[rt];
-                    break;
-                case 0x25: //or
-                    reg[rd] = reg[rs] | reg[rt];
-                    break;
-                case 0x2A: //slt
-                    reg[rd] = (reg[rs] < reg[rt]) ? 1 : 0;
-                    break;
-                case 0x00: //sll
-                    reg[rd] = reg[rt] << shamt;
-                    break;
-                case 0x08: //jr
-                    pc = reg[rs];
-                    break;
-                default:
-                    System.out.println("Unknown R-type instruction)");
-                    break;
-            }
-        } else {
-            switch (opcode) {
-                case 0x08: //addi
-                    reg[rt] = reg[rs] + imm;
-                    break;
-                case 0x23: //lw
-                    int memAddress = (reg[rs] + imm) / 4;
-                    if (memAddress < 0 || memAddress >= memSize) {
-                        System.out.println("Memory access out of bounds");
-                    } else {
-                        reg[rt] = mem[memAddress];
-                    }
-                    break;
-                case 0x2B: //sw
-                    memAddress = (reg[rs] + imm) / 4;
-                    if (memAddress < 0 || memAddress >= memSize) {
-                        System.out.println("Memory access out of bounds");
-                    } else {
-                        mem[memAddress] = reg[rt];
-                    }
-                    break;
-                case 0x04: //beq
-                    if (reg[rs] == reg[rt]) {
-                        pc += imm * 4;
-                    }
-                    break;
-                    case 0x05: //bne
-                    if (reg[rs] != reg[rt]) {
-                        pc += imm * 4;
-                    }
-                    break;
-                case 0x02: //j
-                    pc = address;
-                    break;
-                case 0x03: //jal
-                    reg[31] = pc;
-                    pc = address;
-                    break;
-                default:
-                    System.out.println("Unknown I/J-type instruction");
-                    break;
-            }
-        }
-        reg[0] = 0;
-        return true;
-    }
-            
-
-    //         String instruction = instructionMap.get(pc);
-    //         String[] parts = instruction.split(" ");
-    //         String opcode = parts[0];
-
-    //         pc += 4;
-    //         switch (opcode) {
-    //             case "add":
-    //                 int rd = assembler.reg(parts[1]);
-    //                 int rs = assembler.reg(parts[2]);
-    //                 int rt = assembler.reg(parts[3]);
+    //     if (opcode == 0) {
+    //         switch (funct) {
+    //             case 0x20: //add
     //                 reg[rd] = reg[rs] + reg[rt];
     //                 break;
-    //             case "addi":
-    //                 rt = assembler.reg(parts[1]);
-    //                 rs = assembler.reg(parts[2]);
-    //                 int imm = Integer.parseInt(parts[3]);
-    //                 reg[rt] = reg[rs] + imm;
-    //                 break;
-    //             case "sub":
-    //                 rd = assembler.reg(parts[1]);
-    //                 rs = assembler.reg(parts[2]);
-    //                 rt = assembler.reg(parts[3]);
+    //             case 0x22: //sub
     //                 reg[rd] = reg[rs] - reg[rt];
     //                 break;
-    //             case "and":
-    //                 rd = assembler.reg(parts[1]);
-    //                 rs = assembler.reg(parts[2]);
-    //                 rt = assembler.reg(parts[3]);
+    //             case 0x24: //and
     //                 reg[rd] = reg[rs] & reg[rt];
     //                 break;
-    //             case "or":
-    //                 rd = assembler.reg(parts[1]);
-    //                 rs = assembler.reg(parts[2]);
-    //                 rt = assembler.reg(parts[3]);
+    //             case 0x25: //or
     //                 reg[rd] = reg[rs] | reg[rt];
     //                 break;
-    //             case "slt":
-    //                 rd = assembler.reg(parts[1]);
-    //                 rs = assembler.reg(parts[2]);
-    //                 rt = assembler.reg(parts[3]);
+    //             case 0x2A: //slt
     //                 reg[rd] = (reg[rs] < reg[rt]) ? 1 : 0;
     //                 break;
-    //             case "sll":
-    //                 rd = assembler.reg(parts[1]);
-    //                 rt = assembler.reg(parts[2]);
-    //                 int shamt = Integer.parseInt(parts[3]);
+    //             case 0x00: //sll
     //                 reg[rd] = reg[rt] << shamt;
     //                 break;
-    //             case "jr":
-    //                 rs = assembler.reg(parts[1]);
+    //             case 0x08: //jr
     //                 pc = reg[rs];
     //                 break;
-    //             case "lw":
-    //                 rt = assembler.reg(parts[1]);
-    //                 int offset = Integer.parseInt(parts[2]);
-    //                 rs = assembler.reg(parts[3]);
-    //                 int address = (reg[rs] + offset) / 4;
-    //                 if (address < 0 || address >= memSize) {
-    //                     System.out.println("Memory access out of bounds at address: " + address);
+    //             default:
+    //                 System.out.println("Unknown R-type instruction)");
+    //                 break;
+    //         }
+    //     } else {
+    //         switch (opcode) {
+    //             case 0x08: //addi
+    //                 reg[rt] = reg[rs] + imm;
+    //                 break;
+    //             case 0x23: //lw
+    //                 int memAddress = (reg[rs] + imm) / 4;
+    //                 if (memAddress < 0 || memAddress >= memSize) {
+    //                     System.out.println("Memory access out of bounds");
     //                 } else {
-    //                     reg[rt] = mem[address];
+    //                     reg[rt] = mem[memAddress];
     //                 }
     //                 break;
-    //             case "sw":
-    //                 rt = assembler.reg(parts[1]);
-    //                 offset = Integer.parseInt(parts[2]);
-    //                 rs = assembler.reg(parts[3]);
-    //                 address = (reg[rs] + offset) / 4;
-    //                 if (address < 0 || address >= memSize) {
-    //                     System.out.println("Memory access out of bounds at address: " + address);
+    //             case 0x2B: //sw
+    //                 memAddress = (reg[rs] + imm) / 4;
+    //                 if (memAddress < 0 || memAddress >= memSize) {
+    //                     System.out.println("Memory access out of bounds");
     //                 } else {
-    //                     mem[address] = reg[rt];
+    //                     mem[memAddress] = reg[rt];
     //                 }
     //                 break;
-    //             case "beq":
-    //                 rs = assembler.reg(parts[1]);
-    //                 rt = assembler.reg(parts[2]);
-    //                 //Need to add here
+    //             case 0x04: //beq
+    //                 if (reg[rs] == reg[rt]) {
+    //                     pc += imm * 4;
+    //                 }
     //                 break;
-    //             case "bne":
-    //                 rs = assembler.reg(parts[1]);
-    //                 rt = assembler.reg(parts[2]);
-    //                 //Need to add here
+    //                 case 0x05: //bne
+    //                 if (reg[rs] != reg[rt]) {
+    //                     pc += imm * 4;
+    //                 }
     //                 break;
-    //             case "j":
-    //                 // j instruction logic
+    //             case 0x02: //j
+    //                 pc = address;
     //                 break;
-    //             case "jal":
-    //                 String label = parts[1];
+    //             case 0x03: //jal
     //                 reg[31] = pc;
-    //                 // Jump to label logic
+    //                 pc = address;
     //                 break;
     //             default:
-    //                 System.out.println("Unknown instruction: " + opcode);
+    //                 System.out.println("Unknown I/J-type instruction");
+    //                 break;
     //         }
     //     }
     //     reg[0] = 0;
     //     return true;
     // }
+            
+
+            String instruction = instructionMap.get(pc);
+            String[] parts = instruction.split(" ");
+            String opcode = parts[0];
+
+            pc += 4;
+            switch (opcode) {
+                case "add":
+                    int rd = assembler.reg(parts[1]);
+                    int rs = assembler.reg(parts[2]);
+                    int rt = assembler.reg(parts[3]);
+                    reg[rd] = reg[rs] + reg[rt];
+                    break;
+                case "addi":
+                    rt = assembler.reg(parts[1]);
+                    rs = assembler.reg(parts[2]);
+                    int imm = Integer.parseInt(parts[3]);
+                    reg[rt] = reg[rs] + imm;
+                    break;
+                case "sub":
+                    rd = assembler.reg(parts[1]);
+                    rs = assembler.reg(parts[2]);
+                    rt = assembler.reg(parts[3]);
+                    reg[rd] = reg[rs] - reg[rt];
+                    break;
+                case "and":
+                    rd = assembler.reg(parts[1]);
+                    rs = assembler.reg(parts[2]);
+                    rt = assembler.reg(parts[3]);
+                    reg[rd] = reg[rs] & reg[rt];
+                    break;
+                case "or":
+                    rd = assembler.reg(parts[1]);
+                    rs = assembler.reg(parts[2]);
+                    rt = assembler.reg(parts[3]);
+                    reg[rd] = reg[rs] | reg[rt];
+                    break;
+                case "slt":
+                    rd = assembler.reg(parts[1]);
+                    rs = assembler.reg(parts[2]);
+                    rt = assembler.reg(parts[3]);
+                    reg[rd] = (reg[rs] < reg[rt]) ? 1 : 0;
+                    break;
+                case "sll":
+                    rd = assembler.reg(parts[1]);
+                    rt = assembler.reg(parts[2]);
+                    int shamt = Integer.parseInt(parts[3]);
+                    reg[rd] = reg[rt] << shamt;
+                    break;
+                case "jr":
+                    rs = assembler.reg(parts[1]);
+                    pc = reg[rs];
+                    break;
+                case "lw":
+                    rt = assembler.reg(parts[1]);
+                    int offset = Integer.parseInt(parts[2]);
+                    rs = assembler.reg(parts[3]);
+                    int address = (reg[rs] + offset) / 4;
+                    if (address < 0 || address >= memSize) {
+                        System.out.println("Memory access out of bounds at address: " + address);
+                    } else {
+                        reg[rt] = mem[address];
+                    }
+                    break;
+                case "sw":
+                    rt = assembler.reg(parts[1]);
+                    offset = Integer.parseInt(parts[2]);
+                    rs = assembler.reg(parts[3]);
+                    address = (reg[rs] + offset) / 4;
+                    if (address < 0 || address >= memSize) {
+                        System.out.println("Memory access out of bounds at address: " + address);
+                    } else {
+                        mem[address] = reg[rt];
+                    }
+                    break;
+                case "beq":
+                    rs = assembler.reg(parts[1]);
+                    rt = assembler.reg(parts[2]);
+                    String label = parts[3];
+                    if (reg[rs] == reg[rt]) {
+                        pc = labelToAddress(label);
+                    }
+                    break;
+                case "bne":
+                    rs = assembler.reg(parts[1]);
+                    rt = assembler.reg(parts[2]);
+                    label = parts[3];
+                    if (reg[rs] != reg[rt]) {
+                        pc = labelToAddress(label);
+                    }
+                    break;
+                case "j":
+                    label = parts[1];
+                    pc = labelToAddress(label);
+                    break;
+                case "jal":
+                    label = parts[1];
+                    reg[31] = pc;
+                    pc = labelToAddress(label);
+                    break;
+                default:
+                    System.out.println("Unknown instruction: " + opcode);
+            }
+            reg[0] = 0;
+            return true;
+        }
 
 
 
@@ -360,6 +375,11 @@ public class lab3 {
 
         instructionMap = (Map<Integer, String>) assemblerOutput.get("machineCode");
         labelMap = (Map<Integer, String>) assemblerOutput.get("labels");
+
+
+        for (Map.Entry<Integer, String> entry : labelMap.entrySet()) {
+            newLabelMap.put(entry.getValue(), entry.getKey());
+        }
 
         try {
             if (args.length == 2) {
