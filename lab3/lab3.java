@@ -43,6 +43,7 @@ public class lab3 {
         reg = new int[32];
         mem = new int[memSize];
         pc = 0;
+        System.out.println("Simulator reset");
     }
 
     public static int labelToAddress(String label) {
@@ -152,7 +153,7 @@ public class lab3 {
             String[] parts = instruction.split(" ");
             String opcode = parts[0];
 
-            pc += 4;
+            pc += 1;
             switch (opcode) {
                 case "add":
                     int rd = assembler.reg(parts[1]);
