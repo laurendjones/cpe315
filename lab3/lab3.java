@@ -44,10 +44,10 @@ public class lab3 {
         pc = 0;
     }
 
-    public static void executeInstruction() {
+    public static boolean executeInstruction() {
         if (!instructionMap.containsKey(pc)) {
                 System.out.println("No instruction at pc: " + pc);
-                return;
+                return false;
         } else {
             String instruction = instructionMap.get(pc);
             String[] parts = instruction.split(" ");
@@ -126,18 +126,27 @@ public class lab3 {
                 case "beq":
                     rs = assembler.reg(parts[1]);
                     rt = assembler.reg(parts[2]);
-                    int labelAddress = Integer.parseInt(parts[3]); //This may not work, need to look into it
-                    if (reg[rs] == reg[rt]) {
-                        pc = labelAddress;
-                    }
+                    //Need to add here
+                    break;
+                case "bne":
+                    rs = assembler.reg(parts[1]);
+                    rt = assembler.reg(parts[2]);
+                    //Need to add here
                     break;
                 case "j":
                     // j instruction logic
+                    break;
+                case "jal":
+                    String label = parts[1];
+                    reg[31] = pc;
+                    // Jump to label logic
                     break;
                 default:
                     System.out.println("Unknown instruction: " + opcode);
             }
         }
+        reg[0] = 0;
+        return true;
     }
 
 
@@ -165,13 +174,26 @@ public class lab3 {
                 dumpRegisters();
                 break;
             case "s":
-                // single step through the program (i.e. execute 1 instruction and stop)
-                break;
-            case "s num":
-                // step through num instructions of the program
+                if (parts.length == 1) {
+                    if (!executeInstruction()) {
+                        System.out.println("Program has ended");
+                        break;
+                    }
+                } else { //s num
+                    int num = Integer.parseInt(parts[1]);
+                    for (int i = 0; i < num; i++) {
+                        if (!executeInstruction()) {
+                            System.out.println("Program has ended");
+                            break;
+                        }
+                    }
+                }
                 break;
             case "r":
                 // run until the program ends
+                while (executeInstruction()) {
+                }
+                System.out.println("Program has ended");
                 break;
             case "m num1 num2":
                 // display data memory from location num1 to num2
