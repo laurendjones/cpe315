@@ -189,19 +189,32 @@ public class lab3 {
                 }
                 break;
             case "r":
-                // run until the program ends
                 while (executeInstruction()) {
                 }
                 System.out.println("Program has ended");
                 break;
-            case "m num1 num2":
+            case "m":
+                if (parts.length != 3) {
+                    System.out.println("Invalid command. Use format: m num1 num2");
+                    break;
+                } else {
+                    int num1 = Integer.parseInt(parts[1]);
+                    int num2 = Integer.parseInt(parts[2]);
+                    for (int i = num1; i <= num2; i++) {
+                        if (i < 0 || i >= memSize) {
+                            System.out.println("Memory access out of bounds");
+                        } else {
+                            System.out.println("memory[" + i + "] = " + mem[i]);
+                        }
+                    }
+                }
                 // display data memory from location num1 to num2
                 break;
             case "c":
                 clearState();
                 break;
             case "q":
-                // exit the program
+                System.exit(0);
                 break;
             default:
                 break;
