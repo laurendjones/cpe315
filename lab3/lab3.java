@@ -47,8 +47,94 @@ public class lab3 {
         if (!instructionMap.containsKey(pc)) {
                 System.out.println("No instruction at pc: " + pc);
                 return false;
+        }
+        String word = instructionMap.get(pc);
+        int instruction = Integer.parseInt(word);
+
+        pc += 4;
+
+        int opcode = (instruction >>> 26) & 0x3F;
+        int rs = (instruction >>> 21) & 0x1F;
+        int rt = (instruction >>> 16) & 0x1F;
+        int rd = (instruction >>> 11) & 0x1F;
+        int shamt = (instruction >>> 6) & 0x1F;
+        int funct = instruction & 0x3F;
+        int imm = (short)(instruction & 0xFFFF);
+        int address = (instruction & 0x3FFFFFF) * 4;
+
+        if (opcode == 0) {
+            switch (funct) {
+                case 0x20: //add
+                    reg[rd] = reg[rs] + reg[rt];
+                    break;
+                case 0x22: //sub
+                    reg[rd] = reg[rs] - reg[rt];
+                    break;
+                case 0x24: //and
+                    reg[rd] = reg[rs] & reg[rt];
+                    break;
+                case 0x25: //or
+                    reg[rd] = reg[rs] | reg[rt];
+                    break;
+                case 0x2A: //slt
+                    reg[rd] = (reg[rs] < reg[rt]) ? 1 : 0;
+                    break;
+                case 0x00: //sll
+                    reg[rd] = reg[rt] << shamt;
+                    break;
+                case 0x08: //jr
+                    pc = reg[rs];
+                    break;
+                default:
+                    System.out.println("Unknown R-type instruction)");
+                    break;
+            }
         } else {
-            int word = parsedInstructions.get(pc);
+            switch (opcode) {
+                case 0x08: //addi
+                    reg[rt] = reg[rs] + imm;
+                    break;
+                case 0x23: //lw
+                    int memAddress = (reg[rs] + imm) / 4;
+                    if (memAddress < 0 || memAddress >= memSize) {
+                        System.out.println("Memory access out of bounds");
+                    } else {
+                        reg[rt] = mem[memAddress];
+                    }
+                    break;
+                case 0x2B: //sw
+                    memAddress = (reg[rs] + imm) / 4;
+                    if (memAddress < 0 || memAddress >= memSize) {
+                        System.out.println("Memory access out of bounds");
+                    } else {
+                        mem[memAddress] = reg[rt];
+                    }
+                    break;
+                case 0x04: //beq
+                    if (reg[rs] == reg[rt]) {
+                        pc += imm * 4;
+                    }
+                    break;
+                    case 0x05: //bne
+                    if (reg[rs] != reg[rt]) {
+                        pc += imm * 4;
+                    }
+                    break;
+                case 0x02: //j
+                    pc = address;
+                    break;
+                case 0x03: //jal
+                    reg[31] = pc;
+                    pc = address;
+                    break;
+                default:
+                    System.out.println("Unknown I/J-type instruction");
+                    break;
+            }
+        }
+        reg[0] = 0;
+        return true;
+    }
             
 
     //         String instruction = instructionMap.get(pc);
@@ -180,12 +266,16 @@ public class lab3 {
                     if (!executeInstruction()) {
                         System.out.println("Program has ended");
                         break;
+                    } else {
+                        System.out.println("1 instruction(s) executed");
                     }
                 } else { //s num
                     int num = Integer.parseInt(parts[1]);
+                    int executed = 0;
                     for (int i = 0; i < num; i++) {
+                        executed++;
                         if (!executeInstruction()) {
-                            System.out.println("Program has ended");
+                            System.out.println(executed + " instruction(s) executed");
                             break;
                         }
                     }
