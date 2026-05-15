@@ -22,6 +22,7 @@ public class lab4 {
 
     // Counters
     public static int cycles = 0;
+    public static int stallCycles = 0;
     public static int instructionsCount = 0;
 
     public static Map<Integer, String> instructionMap = new HashMap<>();
@@ -35,6 +36,13 @@ public class lab4 {
         if (!mem_wb.equals("empty")) {
             instructionsCount++;
         }    
+
+        if (stallCycles > 0) {
+            stallCycles--;
+            mem_wb = exe_mem;
+            exe_mem = "empty";
+            return;
+        }
 
         // 2. MEM
         mem_wb = exe_mem;
@@ -54,13 +62,18 @@ public class lab4 {
 
             executeInstruction();
 
-            if (opcode.equals("beq") || opcode.equals("bne")) {
-                System.out.println("Branching hazard");
-                handleHazard(opcode);
-            } else if (opcode.equals("j") || opcode.equals("jal") || opcode.equals("jr")) {
-                System.out.println("Unconditional branching hazard");
-                handleHazard(opcode);
-            } 
+            // Check for hazards using the FULL instruction string
+            int penalty = handleHazard(instruction);
+            if (penalty > 0) {
+                stallCycles = penalty;
+            }
+            // if (opcode.equals("beq") || opcode.equals("bne")) {
+            //     System.out.println("Branching hazard");
+            //     handleHazard(opcode);
+            // } else if (opcode.equals("j") || opcode.equals("jal") || opcode.equals("jr")) {
+            //     System.out.println("Unconditional branching hazard");
+            //     handleHazard(opcode);
+            // } 
         } else {
                 if_id = "empty";
         }
@@ -74,11 +87,43 @@ public class lab4 {
        
         // 1. Conditional branches (3 cycles)
         if (opcode.equals("beq") || opcode.equals("bne")) {
+            System.out.println("Branching hazard");
+            return 3;
         }
 
         // 2. Use-after-load condition (1 cycle)
+        if (id_exe.startsWith("lw")) {
+            String[] lwParts = instructionMap.get(pc - 4).split(" ");
+            int lwRt = assembler.reg(lwParts[1]);
+
+            // Identify source registers
+            int currentRs = -1;
+            int currentRt = -1;
+
+            // I-type (addi, lw, sw)
+            if (instr.length > 2) {
+                if (opcode.equals("addi") || opcode.equals("lw") || opcode.equals("sw"))
+                    currentRs = assembler.reg(instr[2]);
+                } //// R-type (add, sub, slt, and, or)
+                else if (opcode.equals("add") || opcode.equals("sub") || opcode.equals("slt") || opcode.equals("and") || opcode.equals("or")) {
+                    currentRs = assembler.reg(instr[2]);
+                    currentRt = assembler.reg(instr[3]);
+            }
+
+            // if match is found, stall 1 cycle:
+            if (lwRt == currentRs || lwRt == currentRt) {
+                System.out.println("use after load hazard");
+                return 1;
+            }
+            return 0;
+        }
+    
 
         // 3. Unconditional branch (j, jal, jr) (1 cycle)
+        if (opcode.equals("j") || opcode.equals("jal") || opcode.equals("jr")) {
+            System.out.println("Unconditional branch hazard");
+            return 1;
+        }
 
         return 0;
     }
