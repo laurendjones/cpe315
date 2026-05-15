@@ -1,3 +1,7 @@
+To run:
+javac --release 8 lab4.java assembler.java
+java lab4 tests\lab4_test1.asm
+
 CPE 315
 
 Spring 2026

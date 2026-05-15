@@ -5,6 +5,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.HashMap;
 
+// Lauren Jones, Sean Tracy 
+
+
 public class lab4 {
 
     public static int[] reg = new int[32]; 
@@ -27,7 +30,6 @@ public class lab4 {
 
     public static void stepCycle() {
         cycles++;
-        String opcode = "empty";
 
         // 1. WB
         if (!mem_wb.equals("empty")) {
@@ -46,22 +48,21 @@ public class lab4 {
         // 5. IF
         if (instructionMap.containsKey(pc)) {
             String instruction = instructionMap.get(pc);
-            opcode = instruction.split(" ")[0];
+            String opcode = instruction.split(" ")[0];
+            
             if_id = opcode;
-            executeInstruction();
-        }
 
-        if (opcode.equals("beq") || opcode.equals("bne")) {
-            System.out.println("Branching hazard");
-            handleHazard(opcode);
-        } else if (opcode.equals("j") || opcode.equals("jal") || opcode.equals("jr")) {
-            System.out.println("Unconditional branching hazard");
-            handleHazard(opcode);
-        //else if (use after load condition) {
-            //System.out.println("Use-after-load hazard");
-            //handleHazard(opcode);
+            executeInstruction();
+
+            if (opcode.equals("beq") || opcode.equals("bne")) {
+                System.out.println("Branching hazard");
+                handleHazard(opcode);
+            } else if (opcode.equals("j") || opcode.equals("jal") || opcode.equals("jr")) {
+                System.out.println("Unconditional branching hazard");
+                handleHazard(opcode);
+            } 
         } else {
-            if_id = "empty";
+                if_id = "empty";
         }
     }
 
@@ -85,7 +86,7 @@ public class lab4 {
     public static void printSummary() {
         double cpi = (instructionsCount == 0) ? 0 : (double) cycles / instructionsCount;
         System.out.println("Program complete");
-        System.out.println("CPI = " + cpi + "Cycles  = " + cycles + "Instructions = " + instructionsCount);
+        System.out.printf("CPI = %.3f\tCycles  = %d\tInstructions = %d\n", cpi, cycles, instructionsCount);
     }
 
     public static void printHelp() {
@@ -276,23 +277,14 @@ public class lab4 {
                 break;
             case "s":
                 if (parts.length == 1) {
-                    if (!executeInstruction()) {
-                        System.out.println("Program has ended");
-                        break;
-                    } else {
-                        System.out.println("1 instruction(s) executed");
-                    }
-                } else { //s num
+                    stepCycle();
+                    dumpPipelineRegisters();
+                } else { 
                     int num = Integer.parseInt(parts[1]);
-                    int executed = 0;
                     for (int i = 0; i < num; i++) {
-                        executed++;
-                        if (!executeInstruction()) {
-                            
-                            break;
-                        }
+                        stepCycle();
                     }
-                    System.out.println(executed + " instruction(s) executed");
+                    dumpPipelineRegisters();
                 }
                 break;
             case "r":
@@ -366,7 +358,7 @@ public class lab4 {
             return;
         }
 
-        //clearState();
+        clearState();
 
         assembler myAssembler = new assembler();
 
