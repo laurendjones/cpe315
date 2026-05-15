@@ -28,7 +28,7 @@ public class lab4 {
     public static void stepCycle() {
         cycles++;
         String opcode = "empty";
-        
+
         // 1. WB
         if (!mem_wb.equals("empty")) {
             instructionsCount++;
@@ -73,7 +73,6 @@ public class lab4 {
        
         // 1. Conditional branches (3 cycles)
         if (opcode.equals("beq") || opcode.equals("bne")) {
-            if ()
         }
 
         // 2. Use-after-load condition (1 cycle)
@@ -114,8 +113,8 @@ public class lab4 {
     }
 
     public static void dumpPipelineRegisters() {
-        System.out.println("\npc\t if/id\t id/exe\t exe/mem\t mem/wb");
-        System.out.printf("%d\t %s\t %s\t %s\t %s\n", (pc / 4), if_id, id_exe, exe_mem, mem_wb);
+        System.out.println("\npc\tif/id\tid/exe\texe/mem\tmem/wb");
+        System.out.printf("%d\t%s\t%s\t%s\t%s\n", (pc / 4), if_id, id_exe, exe_mem, mem_wb);
         System.out.println();
         }
     
@@ -327,8 +326,6 @@ public class lab4 {
             case "q":
                 System.exit(0);
                 break;
-            case "p":
-
             default:
                 break;
         }
