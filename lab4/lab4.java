@@ -27,7 +27,8 @@ public class lab4 {
 
     public static void stepCycle() {
         cycles++;
-
+        String opcode = "empty";
+        
         // 1. WB
         if (!mem_wb.equals("empty")) {
             instructionsCount++;
@@ -45,12 +46,47 @@ public class lab4 {
         // 5. IF
         if (instructionMap.containsKey(pc)) {
             String instruction = instructionMap.get(pc);
-            String opcode = instruction.split(" ")[0];
+            opcode = instruction.split(" ")[0];
             if_id = opcode;
-            pc += 4;
+            executeInstruction();
+        }
+
+        if (opcode.equals("beq") || opcode.equals("bne")) {
+            System.out.println("Branching hazard");
+            handleHazard(opcode);
+        } else if (opcode.equals("j") || opcode.equals("jal") || opcode.equals("jr")) {
+            System.out.println("Unconditional branching hazard");
+            handleHazard(opcode);
+        //else if (use after load condition) {
+            //System.out.println("Use-after-load hazard");
+            //handleHazard(opcode);
         } else {
             if_id = "empty";
         }
+    }
+
+    public static int handleHazard(String currentInstruction) {
+        if (currentInstruction == null || currentInstruction.equals("empty")) return 0;
+       
+        String[] instr = currentInstruction.split(" ");
+        String opcode = instr[0];
+       
+        // 1. Conditional branches (3 cycles)
+        if (opcode.equals("beq") || opcode.equals("bne")) {
+            if ()
+        }
+
+        // 2. Use-after-load condition (1 cycle)
+
+        // 3. Unconditional branch (j, jal, jr) (1 cycle)
+
+        return 0;
+    }
+
+    public static void printSummary() {
+        double cpi = (instructionsCount == 0) ? 0 : (double) cycles / instructionsCount;
+        System.out.println("Program complete");
+        System.out.println("CPI = " + cpi + "Cycles  = " + cycles + "Instructions = " + instructionsCount);
     }
 
     public static void printHelp() {
@@ -79,6 +115,8 @@ public class lab4 {
 
     public static void dumpPipelineRegisters() {
         System.out.println("\npc\t if/id\t id/exe\t exe/mem\t mem/wb");
+        System.out.printf("%d\t %s\t %s\t %s\t %s\n", (pc / 4), if_id, id_exe, exe_mem, mem_wb);
+        System.out.println();
         }
     
 
@@ -234,6 +272,9 @@ public class lab4 {
             case "d":
                 dumpRegisters();
                 break;
+            case "p":
+                dumpPipelineRegisters();
+                break;
             case "s":
                 if (parts.length == 1) {
                     if (!executeInstruction()) {
@@ -256,9 +297,12 @@ public class lab4 {
                 }
                 break;
             case "r":
-                while (executeInstruction()) {
+                while (instructionMap.containsKey(pc) || 
+                    !if_id.equals("empty") || !id_exe.equals("empty") ||
+                    !exe_mem.equals("empty") || !mem_wb.equals("empty")) {
+                        stepCycle();
                 }
-                //System.out.println("Program has ended");
+                printSummary();
                 break;
             case "m":
                 if (parts.length != 3) {
