@@ -399,7 +399,7 @@ public class lab4 {
     public static void main (String[] args) {
         // Your program should run from the command line with 1 optional argument: java lab3 assembly_file.asm script_file
         if (args.length < 1) {
-            System.out.println("Usage: java lab3 assembly_file.asm [script_file]");
+            System.out.println("Usage: java lab4 assembly_file.asm [script_file]");
             return;
         }
 
