@@ -67,7 +67,12 @@ public class assembler {
 
     public static int reg(String name) {
         if (!Register_map.containsKey(name)) {
-            System.out.print("Unknown register: " + name);
+            try {
+                return Integer.parseInt(name);
+            } catch (NumberFormatException e) {
+                System.out.print("Unknown register: " + name);
+                return -1;
+            }
         }
         return Register_map.get(name);
     }

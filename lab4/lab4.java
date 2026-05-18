@@ -130,7 +130,7 @@ public class lab4 {
 
     public static void printSummary() {
         double cpi = (instructionsCount == 0) ? 0 : (double) cycles / instructionsCount;
-        System.out.println("Program complete");
+        System.out.println("Program complete\n");
         System.out.printf("CPI = %.3f\tCycles  = %d\tInstructions = %d\n", cpi, cycles, instructionsCount);
     }
 
