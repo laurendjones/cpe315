@@ -60,13 +60,17 @@ public class lab4 {
             
             if_id = opcode;
 
-            executeInstruction();
+            
 
             // Check for hazards using the FULL instruction string
             int penalty = handleHazard(instruction);
+            
+            executeInstruction();
+
             if (penalty > 0) {
-                stallCycles = penalty;
+                stallCycles = penalty-1;
             }
+
             // if (opcode.equals("beq") || opcode.equals("bne")) {
             //     System.out.println("Branching hazard");
             //     handleHazard(opcode);
@@ -169,6 +173,13 @@ public class lab4 {
         reg = new int[32];
         mem = new int[memSize];
         pc = 0;
+        if_id = "empty";
+        id_exe = "empty";
+        exe_mem = "empty";
+        mem_wb = "empty";
+        cycles = 0;
+        stallCycles = 0;
+        instructionsCount = 0;
         System.out.println("Simulator reset");
     }
 
