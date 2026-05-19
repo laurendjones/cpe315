@@ -108,7 +108,7 @@ public class lab4 {
             int penalty = handleHazard(instruction);
 
             executeInstruction();
-            pc += 4;
+            //pc += 4;
     
             if (penalty > 1) { // Branch penalty handling
             stallCycles = penalty; 
@@ -247,7 +247,7 @@ public class lab4 {
     }
 
     public static boolean executeInstruction() {
-        if (!instructionMap.containsKey(pc / 4)) {
+        if (!instructionMap.containsKey(pc)) {
                 //System.out.println("No instruction at pc: " + pc);
                 return false;
         }
@@ -257,7 +257,7 @@ public class lab4 {
             String[] parts = instruction.split(" ");
             String opcode = parts[0];
 
-          //  pc += 4;
+            pc += 4;
             switch (opcode) {
                 case "add":
                     int rd = assembler.reg(parts[1]);
