@@ -14,7 +14,7 @@ public class lab4 {
     public static int[] mem;                     
     public static int pc = 0;
     public static final int memSize = 8192;
-    public static int PC_Display = 0; // For debugging: shows the current instruction address in terms of instruction number (pc/4)
+    public static int fetchPC = 0; // For debugging: shows the current instruction address in terms of instruction number (pc/4)
 
     public static String if_id = "empty";
     public static String id_exe = "empty";
@@ -31,8 +31,8 @@ public class lab4 {
     public static Map<String, Integer> newLabelMap = new HashMap<>();
 
     public static void stepCycle() {
-        // PC_Display = (pc / 4) + 1;
         cycles++;
+        // fetchPC = (pc / 4) + 1; // Update fetchPC at the start of the cycle to reflect the instruction being fetched
 
         // 1. WB
         if (!mem_wb.equals("empty") && !mem_wb.equals("squash") && !mem_wb.equals("stall")) {
@@ -44,9 +44,9 @@ public class lab4 {
 
        // if (stallCycles == 3) { // taken branch - flush all 3 stages immediately
        if (stallCycles > 0 ) {
+            exe_mem = id_exe;;
+            id_exe = if_id;
             if_id = "squash";
-            id_exe = "squash";
-            exe_mem = "squash";
             stallCycles--;
             return;
        }
@@ -100,6 +100,7 @@ public class lab4 {
         // 5. IF
         if (instructionMap.containsKey(pc)) {
             String instruction = instructionMap.get(pc);
+            fetchPC = (pc / 4) + 1; // Update fetchPC to reflect the instruction being fetched
             // String opcode = instruction.split(" ")[0];
             // For debugging: shows the current instruction address in terms of instruction number (pc/4)
             if_id = instruction; //was opcode
@@ -107,11 +108,14 @@ public class lab4 {
             // Check for hazards using the FULL instruction string
             int penalty = handleHazard(instruction);
 
-            executeInstruction();
             pc += 4;
+            executeInstruction(instruction);
+            
     
-            if (penalty > 1) { // Branch penalty handling
+            if (penalty == 3) { // Branch penalty handling
             stallCycles = penalty; 
+            } else if (penalty == 1) { // Unconditional jump penalty handling
+                stallCycles = penalty;
             }
         } else {
                 if_id = "empty";
@@ -215,11 +219,11 @@ public class lab4 {
     public static void dumpPipelineRegisters() {
         System.out.println("\npc\tif/id\tid/exe\texe/mem\tmem/wb");
         //System.out.printf("%d\t%s\t%s\t%s\t%s\n", (pc / 4), if_id, id_exe, exe_mem, mem_wb);
-        String if_id_op = if_id.equals("empty") ? "empty" : if_id.split(" ")[0];
-        String id_exe_op = id_exe.equals("empty") ? "empty" : id_exe.split(" ")[0];
-        String exe_mem_op = exe_mem.equals("empty") ? "empty" : exe_mem.split(" ")[0];
-        String mem_wb_op = mem_wb.equals("empty") ? "empty" : mem_wb.split(" ")[0];
-        System.out.printf("%d\t%s\t%s\t%s\t%s\n", (pc / 4), if_id_op, id_exe_op, exe_mem_op, mem_wb_op);
+        String if_id_op = (if_id.equals("empty") || if_id.equals("squash") || if_id.equals("stall")) ? if_id : if_id.split(" ")[0];
+        String id_exe_op = (id_exe.equals("empty") || id_exe.equals("squash") || id_exe.equals("stall")) ? id_exe : id_exe.split(" ")[0];
+        String exe_mem_op = (exe_mem.equals("empty") || exe_mem.equals("squash") || exe_mem.equals("stall")) ? exe_mem : exe_mem.split(" ")[0];
+        String mem_wb_op = (mem_wb.equals("empty") || mem_wb.equals("squash") || mem_wb.equals("stall")) ? mem_wb : mem_wb.split(" ")[0];
+        System.out.printf("%d\t%s\t%s\t%s\t%s\n", fetchPC, if_id_op, id_exe_op, exe_mem_op, mem_wb_op);
         System.out.println();
         }
     
@@ -228,6 +232,7 @@ public class lab4 {
         reg = new int[32];
         mem = new int[memSize];
         pc = 0;
+        fetchPC = 0;
         if_id = "empty";
         id_exe = "empty";
         exe_mem = "empty";
@@ -246,18 +251,19 @@ public class lab4 {
         return newLabelMap.get(label);
     }
 
-    public static boolean executeInstruction() {
-        if (!instructionMap.containsKey(pc / 4)) {
+    public static boolean executeInstruction(String instruction) {
+        //if (!instructionMap.containsKey(pc)) {
+        if (instruction == null || instruction.equals("empty")) {
                 //System.out.println("No instruction at pc: " + pc);
                 return false;
         }
             
 
-            String instruction = instructionMap.get(pc);
+            //String instruction = instructionMap.get(pc);
             String[] parts = instruction.split(" ");
             String opcode = parts[0];
 
-          //  pc += 4;
+            //pc += 4;
             switch (opcode) {
                 case "add":
                     int rd = assembler.reg(parts[1]);
