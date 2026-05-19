@@ -58,7 +58,7 @@ public class lab4 {
             String instruction = instructionMap.get(pc);
             String opcode = instruction.split(" ")[0];
             
-            if_id = opcode;
+            if_id = instruction; //was opcode
 
             
 
@@ -91,13 +91,24 @@ public class lab4 {
        
         // 1. Conditional branches (3 cycles)
         if (opcode.equals("beq") || opcode.equals("bne")) {
-            System.out.println("Branching hazard");
-            return 3;
+            int rs = assembler.reg(instr[1]);
+            int rt = assembler.reg(instr[2]);
+            boolean branchTaken;
+            if (opcode.equals("beq")) {
+                branchTaken = (reg[rs] == reg[rt]);
+            } else { // bne
+                branchTaken = (reg[rs] != reg[rt]);
+            }
+            if (branchTaken) {
+                System.out.println("Branching hazard");
+                return 3;
+            }
+            return 0;
         }
 
         // 2. Use-after-load condition (1 cycle)
-        if (id_exe.startsWith("lw")) {
-            String[] lwParts = instructionMap.get(pc - 4).split(" ");
+        if (id_exe.split(" ")[0].equals("lw")) {
+            String[] lwParts = id_exe.split(" ");
             int lwRt = assembler.reg(lwParts[1]);
 
             // Identify source registers
@@ -106,13 +117,14 @@ public class lab4 {
 
             // I-type (addi, lw, sw)
             if (instr.length > 2) {
-                if (opcode.equals("addi") || opcode.equals("lw") || opcode.equals("sw"))
+                if (opcode.equals("addi") || opcode.equals("lw") || opcode.equals("sw")){
                     currentRs = assembler.reg(instr[2]);
-                } //// R-type (add, sub, slt, and, or)
+                }
+            } //// R-type (add, sub, slt, and, or)
                 else if (opcode.equals("add") || opcode.equals("sub") || opcode.equals("slt") || opcode.equals("and") || opcode.equals("or")) {
                     currentRs = assembler.reg(instr[2]);
                     currentRt = assembler.reg(instr[3]);
-            }
+                }
 
             // if match is found, stall 1 cycle:
             if (lwRt == currentRs || lwRt == currentRt) {
@@ -164,7 +176,12 @@ public class lab4 {
 
     public static void dumpPipelineRegisters() {
         System.out.println("\npc\tif/id\tid/exe\texe/mem\tmem/wb");
-        System.out.printf("%d\t%s\t%s\t%s\t%s\n", (pc / 4), if_id, id_exe, exe_mem, mem_wb);
+        //System.out.printf("%d\t%s\t%s\t%s\t%s\n", (pc / 4), if_id, id_exe, exe_mem, mem_wb);
+        String if_id_op = if_id.equals("empty") ? "empty" : if_id.split(" ")[0];
+        String id_exe_op = id_exe.equals("empty") ? "empty" : id_exe.split(" ")[0];
+        String exe_mem_op = exe_mem.equals("empty") ? "empty" : exe_mem.split(" ")[0];
+        String mem_wb_op = mem_wb.equals("empty") ? "empty" : mem_wb.split(" ")[0];
+        System.out.printf("%d\t%s\t%s\t%s\t%s\n", (pc / 4), if_id_op, id_exe_op, exe_mem_op, mem_wb_op);
         System.out.println();
         }
     
