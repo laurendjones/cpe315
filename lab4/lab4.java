@@ -14,6 +14,7 @@ public class lab4 {
     public static int[] mem;                     
     public static int pc = 0;
     public static final int memSize = 8192;
+    public static int PC_Display = 0; // For debugging: shows the current instruction address in terms of instruction number (pc/4)
 
     public static String if_id = "empty";
     public static String id_exe = "empty";
@@ -30,23 +31,66 @@ public class lab4 {
     public static Map<String, Integer> newLabelMap = new HashMap<>();
 
     public static void stepCycle() {
+        // PC_Display = (pc / 4) + 1;
         cycles++;
 
         // 1. WB
-        if (!mem_wb.equals("empty")) {
+        if (!mem_wb.equals("empty") && !mem_wb.equals("squash") && !mem_wb.equals("stall")) {
             instructionsCount++;
         }    
-
-        if (stallCycles > 0) {
-            stallCycles--;
-            mem_wb = exe_mem;
-            exe_mem = "empty";
-            return;
-        }
 
         // 2. MEM
         mem_wb = exe_mem;
 
+       // if (stallCycles == 3) { // taken branch - flush all 3 stages immediately
+       if (stallCycles > 0 ) {
+            if_id = "squash";
+            id_exe = "squash";
+            exe_mem = "squash";
+            stallCycles--;
+            return;
+       }
+       // } else if (stallCycles == 1) { // unconditional jump - flush only IF/ID
+           // if_id = "squash";
+       // }
+
+        // Use-After-Load Hazard Detection
+        // Check if the instruction currently in ID/EX is a 'lw' and if it conflicts with the instruction in IF/ID
+        if (id_exe != null && !id_exe.equals("empty") && !id_exe.equals("stall") && id_exe.split(" ")[0].equals("lw")) {
+            String[] lwParts = id_exe.split(" ");
+            int lwRt = assembler.reg(lwParts[1]);
+
+            if (!if_id.equals("empty") && !if_id.equals("stall")) {
+                String[] instr = if_id.split(" ");
+                String opcode = instr[0];
+                int currentRs = -1;
+                int currentRt = -1;
+
+                if (instr.length > 2) {
+                    if (opcode.equals("addi") || opcode.equals("lw") || opcode.equals("sw")){
+                        currentRs = assembler.reg(instr[2]);
+                    }
+                } 
+                if (opcode.equals("add") || opcode.equals("sub") || opcode.equals("slt") || opcode.equals("and") || opcode.equals("or")) {
+                    currentRs = assembler.reg(instr[2]);
+                    currentRt = assembler.reg(instr[3]);
+                }
+
+                // If the source matches the load's destination register -> STALL
+                if (lwRt == currentRs || lwRt == currentRt) {
+                    System.out.println("use after load hazard");
+                    
+                    // Let the 'lw' instruction leave EX and advance to MEM
+                    exe_mem = id_exe;
+                    // Inject a stall bubble into EX
+                    id_exe = "stall";
+                    // FREEZE the IF stage: do not change if_id, do not touch PC
+                    return;
+                }
+            }
+        }
+
+        // Normal pipeline if no load hazard
         // 3. EX
         exe_mem = id_exe;
         
@@ -56,35 +100,28 @@ public class lab4 {
         // 5. IF
         if (instructionMap.containsKey(pc)) {
             String instruction = instructionMap.get(pc);
-            String opcode = instruction.split(" ")[0];
-            
+            // String opcode = instruction.split(" ")[0];
+            // For debugging: shows the current instruction address in terms of instruction number (pc/4)
             if_id = instruction; //was opcode
-
-            
 
             // Check for hazards using the FULL instruction string
             int penalty = handleHazard(instruction);
-            
+
             executeInstruction();
-
-            if (penalty > 0) {
-                stallCycles = penalty-1;
+            pc += 4;
+    
+            if (penalty > 1) { // Branch penalty handling
+            stallCycles = penalty; 
             }
-
-            // if (opcode.equals("beq") || opcode.equals("bne")) {
-            //     System.out.println("Branching hazard");
-            //     handleHazard(opcode);
-            // } else if (opcode.equals("j") || opcode.equals("jal") || opcode.equals("jr")) {
-            //     System.out.println("Unconditional branching hazard");
-            //     handleHazard(opcode);
-            // } 
         } else {
                 if_id = "empty";
-        }
+            }
     }
 
     public static int handleHazard(String currentInstruction) {
-        if (currentInstruction == null || currentInstruction.equals("empty")) return 0;
+        if (currentInstruction == null || currentInstruction.equals("empty")) {
+            return 0;
+        }
        
         String[] instr = currentInstruction.split(" ");
         String opcode = instr[0];
@@ -107,7 +144,7 @@ public class lab4 {
         }
 
         // 2. Use-after-load condition (1 cycle)
-        if (id_exe.split(" ")[0].equals("lw")) {
+        if (id_exe != null && !id_exe.equals("empty") && id_exe.split(" ")[0].equals("lw")) {
             String[] lwParts = id_exe.split(" ");
             int lwRt = assembler.reg(lwParts[1]);
 
@@ -120,8 +157,10 @@ public class lab4 {
                 if (opcode.equals("addi") || opcode.equals("lw") || opcode.equals("sw")){
                     currentRs = assembler.reg(instr[2]);
                 }
-            } //// R-type (add, sub, slt, and, or)
-                else if (opcode.equals("add") || opcode.equals("sub") || opcode.equals("slt") || opcode.equals("and") || opcode.equals("or")) {
+            } 
+            
+            //// R-type (add, sub, slt, and, or)
+            if (opcode.equals("add") || opcode.equals("sub") || opcode.equals("slt") || opcode.equals("and") || opcode.equals("or")) {
                     currentRs = assembler.reg(instr[2]);
                     currentRt = assembler.reg(instr[3]);
                 }
@@ -131,7 +170,6 @@ public class lab4 {
                 System.out.println("use after load hazard");
                 return 1;
             }
-            return 0;
         }
     
 
@@ -209,7 +247,7 @@ public class lab4 {
     }
 
     public static boolean executeInstruction() {
-        if (!instructionMap.containsKey(pc)) {
+        if (!instructionMap.containsKey(pc / 4)) {
                 //System.out.println("No instruction at pc: " + pc);
                 return false;
         }
@@ -219,7 +257,7 @@ public class lab4 {
             String[] parts = instruction.split(" ");
             String opcode = parts[0];
 
-            pc += 4;
+          //  pc += 4;
             switch (opcode) {
                 case "add":
                     int rd = assembler.reg(parts[1]);
@@ -361,7 +399,7 @@ public class lab4 {
                 }
                 break;
             case "r":
-                while (instructionMap.containsKey(pc) || 
+                while (instructionMap.containsKey(pc) || stallCycles > 0 ||
                     !if_id.equals("empty") || !id_exe.equals("empty") ||
                     !exe_mem.equals("empty") || !mem_wb.equals("empty")) {
                         stepCycle();
