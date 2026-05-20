@@ -43,7 +43,6 @@ public class lab4 {
         // 2. MEM
         mem_wb = exe_mem;
 
-       // if (stallCycles == 3) { // taken branch - flush all 3 stages immediately
        if (stallCycles > 0 ) {
             if (branchTaken && stallCycles == 1) {
                 if_id = "squash";
@@ -64,12 +63,7 @@ public class lab4 {
                 return;
             }
        }
-       // } else if (stallCycles == 1) { // unconditional jump - flush only IF/ID
-           // if_id = "squash";
-       // }
 
-        // Use-After-Load Hazard Detection
-        // Check if the instruction currently in ID/EX is a 'lw' and if it conflicts with the instruction in IF/ID
         if (id_exe != null && !id_exe.equals("empty") && !id_exe.equals("stall") && id_exe.split(" ")[0].equals("lw")) {
             String[] lwParts = id_exe.split(" ");
             int lwRt = assembler.reg(lwParts[1]);
@@ -90,19 +84,14 @@ public class lab4 {
                     currentRt = assembler.reg(instr[3]);
                 }
 
-                // If the source matches the load's destination register -> STALL
                 if (lwRt == currentRs || lwRt == currentRt) {           
-                    // Let the 'lw' instruction leave EX and advance to MEM
                     exe_mem = id_exe;
-                    // Inject a stall bubble into EX
                     id_exe = "stall";
-                    // FREEZE the IF stage: do not change if_id, do not touch PC
                     return;
                 }
             }
         }
 
-        // Normal pipeline if no load hazard
         // 3. EX
         exe_mem = id_exe;
         
@@ -113,11 +102,8 @@ public class lab4 {
         if (instructionMap.containsKey(pc)) {
             String instruction = instructionMap.get(pc);
             fetchPC = (pc / 4) + 1;
-            // String opcode = instruction.split(" ")[0];
-            // For debugging: shows the current instruction address in terms of instruction number (pc/4)
             if_id = instruction; //was opcode
 
-            // Check for hazards using the FULL instruction string
             int penalty = handleHazard(instruction);
 
             pc += 4;
@@ -129,8 +115,8 @@ public class lab4 {
                 stallCycles = penalty;
                 if (penalty == 3) {
                     branchTaken = true;
-                    branchTarget = pc; // save where branch wants to go
-                    pc = fetchPC * 4;  // restore sequential pc
+                    branchTarget = pc;
+                    pc = fetchPC * 4;
                 } else {
                     branchTaken = false;
                 }
@@ -169,7 +155,6 @@ public class lab4 {
             String[] lwParts = id_exe.split(" ");
             int lwRt = assembler.reg(lwParts[1]);
 
-            // Identify source registers
             int currentRs = -1;
             int currentRt = -1;
 
@@ -186,7 +171,6 @@ public class lab4 {
                     currentRt = assembler.reg(instr[3]);
                 }
 
-            // if match is found, stall 1 cycle:
             if (lwRt == currentRs || lwRt == currentRt) {
                 return 0;
             }
@@ -233,7 +217,6 @@ public class lab4 {
 
     public static void dumpPipelineRegisters() {
         System.out.println("\npc\tif/id\tid/exe\texe/mem\tmem/wb");
-        //System.out.printf("%d\t%s\t%s\t%s\t%s\n", (pc / 4), if_id, id_exe, exe_mem, mem_wb);
         String if_id_op = (if_id.equals("empty") || if_id.equals("squash") || if_id.equals("stall")) ? if_id : if_id.split(" ")[0];
         String id_exe_op = (id_exe.equals("empty") || id_exe.equals("squash") || id_exe.equals("stall")) ? id_exe : id_exe.split(" ")[0];
         String exe_mem_op = (exe_mem.equals("empty") || exe_mem.equals("squash") || exe_mem.equals("stall")) ? exe_mem : exe_mem.split(" ")[0];
@@ -269,14 +252,11 @@ public class lab4 {
     }
 
     public static boolean executeInstruction(String instruction) {
-        //if (!instructionMap.containsKey(pc)) {
         if (instruction == null || instruction.equals("empty")) {
-                //System.out.println("No instruction at pc: " + pc);
                 return false;
         }
             
 
-            //String instruction = instructionMap.get(pc);
             String[] parts = instruction.split(" ");
             String opcode = parts[0];
 
@@ -444,7 +424,6 @@ public class lab4 {
                         }
                     }
                 }
-                // display data memory from location num1 to num2
                 break;
             case "c":
                 clearState();
@@ -465,7 +444,7 @@ public class lab4 {
         }
 
         if (!scanner.hasNextLine()) {
-            break; // End of file or input stream
+            break;
         }
 
         String command = scanner.nextLine().trim();
@@ -486,7 +465,6 @@ public class lab4 {
 }
 
     public static void main (String[] args) {
-        // Your program should run from the command line with 1 optional argument: java lab3 assembly_file.asm script_file
         if (args.length < 1) {
             System.out.println("Usage: java lab4 assembly_file.asm [script_file]");
             return;
