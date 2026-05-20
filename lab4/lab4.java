@@ -422,18 +422,10 @@ public class lab4 {
                 }
                 break;
             case "r":
-                int safety = 0;
                 while (instructionMap.containsKey(pc) || stallCycles > 0 ||
                     branchTaken || !if_id.equals("empty") || !id_exe.equals("empty") ||
                     !exe_mem.equals("empty") || !mem_wb.equals("empty")) {
                         stepCycle();
-                        safety++;
-                        if (safety > 10000) {
-                            System.out.println("INFINITE LOOP DETECTED: pc=" + pc + 
-                            " reg[31]=$ra=" + reg[31] + 
-                            " stallCycles=" + stallCycles + 
-                            " branchTaken=" + branchTaken + 
-                            " if_id=" + if_id);
                         break;
                         }
                 }
