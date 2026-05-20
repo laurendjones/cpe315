@@ -14,7 +14,9 @@ public class lab4 {
     public static int[] mem;                     
     public static int pc = 0;
     public static final int memSize = 8192;
-    public static int fetchPC = 0; // For debugging: shows the current instruction address in terms of instruction number (pc/4)
+    public static int fetchPC = 0;
+    public static boolean branchTaken = false;
+    public static int branchTarget = -1;
 
     public static String if_id = "empty";
     public static String id_exe = "empty";
@@ -32,7 +34,6 @@ public class lab4 {
 
     public static void stepCycle() {
         cycles++;
-        // fetchPC = (pc / 4) + 1; // Update fetchPC at the start of the cycle to reflect the instruction being fetched
 
         // 1. WB
         if (!mem_wb.equals("empty") && !mem_wb.equals("squash") && !mem_wb.equals("stall")) {
@@ -44,11 +45,24 @@ public class lab4 {
 
        // if (stallCycles == 3) { // taken branch - flush all 3 stages immediately
        if (stallCycles > 0 ) {
-            exe_mem = id_exe;;
-            id_exe = if_id;
-            if_id = "squash";
-            stallCycles--;
-            return;
+            if (branchTaken && stallCycles == 1) {
+                if_id = "squash";
+                id_exe = "squash";
+                exe_mem = "squash";
+                pc = branchTarget;
+                fetchPC = (pc / 4);
+                stallCycles = 0;
+                return;
+            } else if (branchTaken) {
+                stallCycles--;
+            } else {
+                exe_mem = id_exe;;
+                id_exe = if_id;
+                if_id = "squash";
+                fetchPC = (pc / 4);
+                stallCycles--;
+                return;
+            }
        }
        // } else if (stallCycles == 1) { // unconditional jump - flush only IF/ID
            // if_id = "squash";
@@ -77,9 +91,7 @@ public class lab4 {
                 }
 
                 // If the source matches the load's destination register -> STALL
-                if (lwRt == currentRs || lwRt == currentRt) {
-                    System.out.println("use after load hazard");
-                    
+                if (lwRt == currentRs || lwRt == currentRt) {           
                     // Let the 'lw' instruction leave EX and advance to MEM
                     exe_mem = id_exe;
                     // Inject a stall bubble into EX
@@ -100,7 +112,7 @@ public class lab4 {
         // 5. IF
         if (instructionMap.containsKey(pc)) {
             String instruction = instructionMap.get(pc);
-            fetchPC = (pc / 4) + 1; // Update fetchPC to reflect the instruction being fetched
+            fetchPC = (pc / 4) + 1;
             // String opcode = instruction.split(" ")[0];
             // For debugging: shows the current instruction address in terms of instruction number (pc/4)
             if_id = instruction; //was opcode
@@ -112,14 +124,19 @@ public class lab4 {
             executeInstruction(instruction);
             
     
-            if (penalty == 3) { // Branch penalty handling
-            stallCycles = penalty; 
-            } else if (penalty == 1) { // Unconditional jump penalty handling
+            if (stallCycles == 0) {
                 stallCycles = penalty;
+                if (penalty == 3) {
+                    branchTaken = true;
+                    branchTarget = pc; // save where branch wants to go
+                    pc = fetchPC * 4;  // restore sequential pc
+                } else {
+                    branchTaken = false;
+                }
             }
         } else {
-                if_id = "empty";
-            }
+            if_id = "empty";
+        }
     }
 
     public static int handleHazard(String currentInstruction) {
@@ -141,7 +158,6 @@ public class lab4 {
                 branchTaken = (reg[rs] != reg[rt]);
             }
             if (branchTaken) {
-                System.out.println("Branching hazard");
                 return 3;
             }
             return 0;
@@ -171,15 +187,13 @@ public class lab4 {
 
             // if match is found, stall 1 cycle:
             if (lwRt == currentRs || lwRt == currentRt) {
-                System.out.println("use after load hazard");
-                return 1;
+                return 0;
             }
         }
     
 
         // 3. Unconditional branch (j, jal, jr) (1 cycle)
         if (opcode.equals("j") || opcode.equals("jal") || opcode.equals("jr")) {
-            System.out.println("Unconditional branch hazard");
             return 1;
         }
 
@@ -240,7 +254,9 @@ public class lab4 {
         cycles = 0;
         stallCycles = 0;
         instructionsCount = 0;
-        System.out.println("Simulator reset");
+        branchTaken = false;
+        branchTarget = -1;
+        // System.out.println("Simulator reset");
     }
 
     public static int labelToAddress(String label) {
