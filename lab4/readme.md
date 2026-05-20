@@ -1,6 +1,7 @@
 To run:
 - javac --release 8 lab4.java assembler.java
 - java lab4 tests\lab4_test1.asm
+- java lab4 tests\lab4_test1.asm tests\lab4_test1.script
 
 CPE 315
 
