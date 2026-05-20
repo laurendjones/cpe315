@@ -426,8 +426,6 @@ public class lab4 {
                     branchTaken || !if_id.equals("empty") || !id_exe.equals("empty") ||
                     !exe_mem.equals("empty") || !mem_wb.equals("empty")) {
                         stepCycle();
-                        break;
-                        }
                 }
                 printSummary();
                 break;
