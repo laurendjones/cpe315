@@ -3,6 +3,13 @@ To run:
 - java lab4 tests\lab4_test1.asm
 - java lab4 tests\lab4_test1.asm tests\lab4_test1.script
 
+To submit:
+- ssh ljones46@unix1.csc.calpoly.edu
+- handin jseng CPE315_lab4
+- git pull [inside directory]
+- 
+
+
 CPE 315
 
 Spring 2026

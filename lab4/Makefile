@@ -1,22 +1,24 @@
-JC = javac
-JVM = java
-FLAGS = -encoding UTF-8
+JAVAC = javac
+JAVA  = java
 
-SRCS = assembler.java lab4.java
-CLASSES = assembler.class lab4.class
+SRCS  = assembler.java lab4.java
+MAIN  = lab4
 
-all: $(CLASSES)
+.PHONY: all run clean
+
+all: $(SRCS:.java=.class)
+
+%.class: %.java
+	$(JAVAC) $<
 
 assembler.class: assembler.java
-	$(JC) $(FLAGS) assembler.java
+	$(JAVAC) assembler.java
 
 lab4.class: lab4.java assembler.class
-	$(JC) $(FLAGS) lab4.java
+	$(JAVAC) lab4.java
 
-run: $(CLASSES)
-	$(JVM) lab4 $(ASM) $(SCRIPT)
+run: all
+	$(JAVA) $(MAIN) $(ARGS)
 
 clean:
 	rm -f *.class
-
-.PHONY: all run clean
