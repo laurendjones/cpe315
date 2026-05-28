@@ -16,7 +16,7 @@ lab5.class: lab5.java assembler.class
 	$(JC) lab5.java
 
 run: $(CLASSES)
-	$(JVM) $(MAIN) $(ASM) $(SCRIPT) $(GHR)
+	$(JVM) $(MAIN) $(ARGS)
 
 clean:
 	rm -f $(CLASSES)
