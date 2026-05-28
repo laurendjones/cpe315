@@ -279,7 +279,19 @@ public class lab5 {
         instructionsCount = 0;
         branchTaken = false;
         branchTarget = -1;
+        branchTotal = 0;
+        correctPredictions = 0;
+         predictorInit();
         // System.out.println("Simulator reset");
+    }
+
+    public static void PrintBranchAccuracy() {
+        if (branchTotal == 0) {
+            System.out.println("No branches executed.");
+        } else {
+            double accuracy = (double) correctPredictions / branchTotal * 100;
+            System.out.printf("Branch Prediction Accuracy: %.2f%% (%d/%d)\n", accuracy, correctPredictions, branchTotal);
+        }
     }
 
     public static int labelToAddress(String label) {
@@ -463,6 +475,9 @@ public class lab5 {
                         }
                     }
                 }
+                break;
+            case "b":
+                PrintBranchAccuracy();
                 break;
             case "c":
                 clearState();
