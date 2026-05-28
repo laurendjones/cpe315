@@ -181,8 +181,8 @@ public class lab5 {
             branchTotal++;
             if (prediction == branchTaken) {
                 correctPredictions++;
-                updatePredictor(branchTaken);
             }
+            updatePredictor(branchTaken);
             if (branchTaken) {
                 return 3;
             }
@@ -239,6 +239,7 @@ public class lab5 {
         System.out.println("r = run until the program ends and display timing summary");
         System.out.println("m num1 num2 = display data memory from location num1 to num2");
         System.out.println("c = clear all registers, memory, and the program counter to 0");
+        System.out.println("b = display branch prediction accuracy");
         System.out.println("q = exit the program");
     }
 
@@ -524,6 +525,21 @@ public class lab5 {
             return;
         }
 
+        if (args.length >= 3) {
+            try {
+                ghrSize = Integer.parseInt(args[2]);
+                if (ghrSize < 1) {
+                    System.out.println("GHR size must be at least 1. Using default size of 2.");
+                    ghrSize = 2;
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid GHR size. Using default size of 2.");
+                ghrSize = 2;
+            }
+        } else {
+            ghrSize = 2;
+        }
+
         clearState();
 
         assembler myAssembler = new assembler();
@@ -540,7 +556,7 @@ public class lab5 {
         }
 
         try {
-            if (args.length == 2) {
+            if (args.length >= 2) {
                 // SCRIPT MODE: Read from the file provided in args[1]
                 File scriptFile = new File(args[1]);
                 Scanner scriptScanner = new Scanner(scriptFile);
