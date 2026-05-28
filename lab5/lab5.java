@@ -8,7 +8,7 @@ import java.util.HashMap;
 // Lauren Jones, Sean Tracy 
 
 
-public class lab4 {
+public class lab5 {
 
     public static int[] reg = new int[32]; 
     public static int[] mem;                     
@@ -31,6 +31,38 @@ public class lab4 {
     public static Map<Integer, String> instructionMap = new HashMap<>();
     public static Map<Integer, String> labelMap = new HashMap<>();
     public static Map<String, Integer> newLabelMap = new HashMap<>();
+
+    public static int ghrSize = 2;
+    public static int ghr = 0;
+    public static int[] predictionTable;
+    public static int branchTotal = 0;
+    public static int correctPredictions = 0;
+
+    public static void predictorInit() {
+        int tableSize = 1 << ghrSize;
+        predictionTable = new int[tableSize];
+        ghr = 0;
+    }
+
+    public static boolean predict() {
+        int index = ghr & ((1 << ghrSize) - 1);
+        return predictionTable[index] >= 2;
+    }
+
+    public static void updatePredictor(boolean taken) {
+        int index = ghr & ((1 << ghrSize) - 1);
+        if (taken) {
+            if (predictionTable[index] < 3) {
+                predictionTable[index]++;
+            }
+        } else {
+            if (predictionTable[index] > 0) {
+                predictionTable[index]--;
+            }
+        }
+        ghr = ((ghr << 1) | (taken ? 1 : 0)) & ((1 << ghrSize) - 1);
+    }
+
 
     public static void stepCycle() {
         cycles++;
@@ -143,6 +175,13 @@ public class lab4 {
                 branchTaken = (reg[rs] == reg[rt]);
             } else { // bne
                 branchTaken = (reg[rs] != reg[rt]);
+            }
+
+            boolean prediction = predict();
+            branchTotal++;
+            if (prediction == branchTaken) {
+                correctPredictions++;
+                updatePredictor(branchTaken);
             }
             if (branchTaken) {
                 return 3;
