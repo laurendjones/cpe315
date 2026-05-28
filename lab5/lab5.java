@@ -521,7 +521,7 @@ public class lab5 {
 
     public static void main (String[] args) {
         if (args.length < 1) {
-            System.out.println("Usage: java lab4 assembly_file.asm [script_file]");
+            System.out.println("Usage: java lab5 assembly_file.asm [script_file]");
             return;
         }
 
