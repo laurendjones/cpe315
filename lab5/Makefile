@@ -6,9 +6,6 @@ MAIN = lab5
 
 all: $(CLASSES)
 
-%.class: %.java
-	$(JC) $<
-
 assembler.class: assembler.java
 	$(JC) assembler.java
 
