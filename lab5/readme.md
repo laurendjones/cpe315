@@ -1,6 +1,6 @@
 To run:
 - javac --release 8 lab5\lab5.java lab5\assembler.java
-- java -cp lab5 lab5 C:\Users\laure\OneDrive\Documents\Cal_Poly_CPE\CPE_315\cpe315\lab4\tests\lab4_fib20.asm lab5\tests\lab5.script 8 
+- java -cp lab5 lab5 C:\Users\laure\OneDrive\Documents\Cal_Poly_CPE\CPE_315\cpe315\lab4\tests\lab4_fib20.asm "C:\Users\laure\OneDrive\Documents\Cal_Poly_CPE\CPE_315\cpe315\lab5\tests\lab5.script" 8 
 - java lab5 tests\lab4_fib20.asm tests\lab4_test1.script
 
 To submit in server:

@@ -459,7 +459,7 @@ public class lab5 {
                     !exe_mem.equals("empty") || !mem_wb.equals("empty")) {
                         stepCycle();
                 }
-                printSummary();
+                //printSummary();
                 break;
             case "m":
                 if (parts.length != 3) {
