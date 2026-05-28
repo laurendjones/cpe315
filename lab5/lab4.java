@@ -389,6 +389,11 @@ public class lab4 {
             case "p":
                 dumpPipelineRegisters();
                 break;
+            case "b":
+                // accuracy 61.79% (8360 correct predictions, 13529 predictions) 
+                float accuracy = correctPredictions / predictions;
+                System.out.println("accuracy ", accuracy, "% (", correctPredictions, " correct predictions, ", predictions, " predictions)");
+                break;
             case "s":
                 if (parts.length == 1) {
                     stepCycle();
