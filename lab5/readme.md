@@ -5,8 +5,9 @@ To run:
 
 To submit in server:
 - ssh ljones46@unix1.csc.calpoly.edu
-- handin jseng CPE315_lab4
+- handin jseng CPE315_lab5
 - git pull [inside directory]
+- handin jseng CPE315_lab5 "file"
 
 Run makefile in server:
 - make run ARGS="tests/lab4_test1.asm tests/lab4_test1.script"
