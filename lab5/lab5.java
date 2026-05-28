@@ -507,6 +507,7 @@ public class lab5 {
         // SCRIPT MODE 
         if (!isInteractive) {
             System.out.println("mips> " + command);
+            //System.out.println("[SCRIPT DEBUG] Reading Command: " + command);
         }
 
         if (command.equals("q")) {
